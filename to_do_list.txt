@@ -1,0 +1,9 @@
+-2. Create test for new event view
+-1. Create Event view
+-1/2. Slug to event views
+0. Allow use of month slug in url
+1. Add ability to create calendar
+2. Validate event data
+3. Add better date-picker abilites
+4. Add colors for calendars
+5. Allow filtering of calendars in urls
