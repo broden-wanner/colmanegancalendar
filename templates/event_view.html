@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<div class="container">
+		<h1>{{ event.title }}</h1>
+		<p>Calendar: {{ event.calendar.event_calendar }}</p>
+		<p>Event Info: {{ event.event_info }}</p>
+		<p>Starts: {{ event.start_date }} {{ event.start_time }}</p>
+		<p>Ends: {{ event.end_date }} {{ event.end_time }}</p>
+		<p>Date Created: {{ event.date_created }}</p>
+		<p><a href="{% url 'edit_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Edit Event</a></p>
+	</div>
+{% endblock %}

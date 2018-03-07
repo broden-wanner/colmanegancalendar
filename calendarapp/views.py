@@ -1,12 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.utils import timezone
 from .models import Year, Month, Day, Calendar, Event
-from .forms import NewEventForm
+from .forms import EventForm, CalendarForm
 
 def calendarHomeView(request):
-	year = int(timezone.now().year)
-	month = int(timezone.now().month-1)
-	return redirect('month', year=year, month=month)
+	return redirect('month', year=timezone.now().year, month=timezone.now().month)
 
 def calendarMonthView(request, year, month):
 	current_year = get_object_or_404(Year, year=year)
@@ -16,19 +14,19 @@ def calendarMonthView(request, year, month):
 	number_of_days_from_previous_month = days_of_month[0].day_of_week
 	number_of_days_from_next_month = 6 - days_of_month[-1].day_of_week + 7
 
-	if month > 0:
+	if month > 1:
 		previous_month = get_object_or_404(Month, year=get_object_or_404(Year, year=year), month=month-1)
 		previous_month_days = Day.objects.filter(month=previous_month).order_by('day_of_month').reverse()[0:number_of_days_from_previous_month]
-	elif month == 0:
-		previous_month = get_object_or_404(Month, year=get_object_or_404(Year, year=year-1), month=11)
+	elif month == 1:
+		previous_month = get_object_or_404(Month, year=get_object_or_404(Year, year=year-1), month=12)
 		previous_month_days = Day.objects.filter(month=previous_month).order_by('day_of_month').reverse()[0:number_of_days_from_previous_month]
 	previous_month_days = list(previous_month_days)[::-1]
 
-	if month < 11:
+	if month < 12:
 		next_month = get_object_or_404(Month, year=get_object_or_404(Year, year=year), month=month+1)
 		next_month_days = Day.objects.filter(month=next_month)[0:number_of_days_from_next_month]
-	elif month == 11:
-		next_month = get_object_or_404(Month, year=get_object_or_404(Year, year=year+1), month=0)
+	elif month == 12:
+		next_month = get_object_or_404(Month, year=get_object_or_404(Year, year=year+1), month=1)
 		next_month_days = Day.objects.filter(month=next_month)[0:number_of_days_from_next_month]
 
 	calendar_rows = []
@@ -65,12 +63,40 @@ def calendarMonthView(request, year, month):
 
 def newEventView(request):
 	if request.method == 'POST':
-		new_event_form = NewEventForm(request.POST)
+		new_event_form = EventForm(request.POST)
 		if new_event_form.is_valid():
 			new_event = new_event_form.save(commit=False)
 			new_event.save()
-			return redirect('month', year=new_event.start_time.year, month=new_event.start_time.month-1)
+			return redirect('month', year=new_event.start_date.year, month=new_event.start_date.month)
 	else:
-		new_event_form = NewEventForm()
+		new_event_form = EventForm()
 
 	return render(request, 'new_event.html', {'new_event_form': new_event_form})
+
+def calendarEventView(request, year, month, day, pk, slug):
+	event = get_object_or_404(Event, pk=pk, slug=slug)
+	return render(request, 'event_view.html', {'event': event})
+
+def editEventView(request, year, month, day, pk, slug):
+	event = get_object_or_404(Event, pk=pk, slug=slug)
+	if request.method == 'POST':
+		event_form = EventForm(request.POST, instance=event)
+		if event_form.is_valid():
+			event = event_form.save(commit=False)
+			event.save()
+			return redirect('month', year=event.start_date.year, month=event.start_date.month)
+	else:
+		event_form = EventForm(instance=event)
+
+	return render(request, 'edit_event.html', {'event_form': event_form})
+
+def newCalendarView(request):
+	if request.method == 'POST':
+		new_calendar_form = CalendarForm(request.POST)
+		if new_calendar_form.is_valid():
+			new_calendar_form.save()
+			return redirect('month', year=timezone.now().year, month=timezone.now().month)
+	else:
+		new_calendar_form = CalendarForm()
+
+	return render(request, 'new_calendar.html', {'new_calendar_form': new_calendar_form})

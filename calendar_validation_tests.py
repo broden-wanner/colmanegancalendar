@@ -41,20 +41,20 @@ class CalendarTest(unittest.TestCase):
 
 	def test_month_validity(self):
 		year = Year.objects.get(year=2010)
-		self.month_tester(Month.objects.get(year=year, month=0), year, 0, 'January', 31, 5, 'Friday')
-		self.month_tester(Month.objects.get(year=year, month=1), year, 1, 'February', 28, 1, 'Monday')
-		self.month_tester(Month.objects.get(year=year, month=6), year, 6, 'July', 31, 4, 'Thursday')
-		self.month_tester(Month.objects.get(year=year, month=11), year, 11, 'December', 31, 3, 'Wednesday')
+		self.month_tester(Month.objects.get(year=year, month=1), year, 1, 'January', 31, 5, 'Friday')
+		self.month_tester(Month.objects.get(year=year, month=2), year, 2, 'February', 28, 1, 'Monday')
+		self.month_tester(Month.objects.get(year=year, month=7), year, 7, 'July', 31, 4, 'Thursday')
+		self.month_tester(Month.objects.get(year=year, month=12), year, 12, 'December', 31, 3, 'Wednesday')
 		year = Year.objects.get(year=2016)
-		self.month_tester(Month.objects.get(year=year, month=0), year, 0, 'January', 31, 5, 'Friday')
-		self.month_tester(Month.objects.get(year=year, month=1), year, 1, 'February', 29, 1, 'Monday')
-		self.month_tester(Month.objects.get(year=year, month=6), year, 6, 'July', 31, 5, 'Friday')
-		self.month_tester(Month.objects.get(year=year, month=11), year, 11, 'December', 31, 4, 'Thursday')
+		self.month_tester(Month.objects.get(year=year, month=1), year, 1, 'January', 31, 5, 'Friday')
+		self.month_tester(Month.objects.get(year=year, month=2), year, 2, 'February', 29, 1, 'Monday')
+		self.month_tester(Month.objects.get(year=year, month=7), year, 7, 'July', 31, 5, 'Friday')
+		self.month_tester(Month.objects.get(year=year, month=12), year, 12, 'December', 31, 4, 'Thursday')
 		year = Year.objects.get(year=2020)
-		self.month_tester(Month.objects.get(year=year, month=0), year, 0, 'January', 31, 3, 'Wednesday')
-		self.month_tester(Month.objects.get(year=year, month=1), year, 1, 'February', 29, 6, 'Saturday')
-		self.month_tester(Month.objects.get(year=year, month=6), year, 6, 'July', 31, 3, 'Wednesday')
-		self.month_tester(Month.objects.get(year=year, month=11), year, 11, 'December', 31, 2, 'Tuesday')
+		self.month_tester(Month.objects.get(year=year, month=1), year, 1, 'January', 31, 3, 'Wednesday')
+		self.month_tester(Month.objects.get(year=year, month=2), year, 2, 'February', 29, 6, 'Saturday')
+		self.month_tester(Month.objects.get(year=year, month=7), year, 7, 'July', 31, 3, 'Wednesday')
+		self.month_tester(Month.objects.get(year=year, month=12), year, 12, 'December', 31, 2, 'Tuesday')
 
 	def day_tester(self, day_object, month, day_of_month, day_of_week, day_of_week_str):
 		self.assertEquals(day_object.month, month, 'Wrong month on this day')
@@ -62,34 +62,34 @@ class CalendarTest(unittest.TestCase):
 		self.assertEquals(day_object.day_of_week, day_of_week, 'Wrong day of week')
 		self.assertEquals(day_object.day_of_week_str, day_of_week_str, 'Wrong day of week string')
 
-	def test_day_validity(self):
-		month = Month.objects.get(year=Year.objects.get(year=2011), month=0)
-		self.day_tester(Day.objects.get(month=month, day_of_month=1), month, 1, 6, 'Saturday')
-
-		month = Month.objects.get(year=Year.objects.get(year=2011), month=1)
-		self.day_tester(Day.objects.get(month=month, day_of_month=28), month, 28, 1, 'Monday')
-
-		month = Month.objects.get(year=Year.objects.get(year=2011), month=10)
-		self.day_tester(Day.objects.get(month=month, day_of_month=25), month, 25, 5, 'Friday')
-
-		month = Month.objects.get(year=Year.objects.get(year=2017), month=0)
-		self.day_tester(Day.objects.get(month=month, day_of_month=28), month, 28, 6, 'Saturday')
-
-		month = Month.objects.get(year=Year.objects.get(year=2017), month=4)
-		self.day_tester(Day.objects.get(month=month, day_of_month=22), month, 22, 1, 'Monday')
-
-		month = Month.objects.get(year=Year.objects.get(year=2018), month=0)
-		self.day_tester(Day.objects.get(month=month, day_of_month=1), month, 1, 1, 'Monday')
-
-		month = Month.objects.get(year=Year.objects.get(year=2018), month=10)
-		self.day_tester(Day.objects.get(month=month, day_of_month=23), month, 23, 5, 'Friday')
-
 	def test_to_ensure_all_days_exist_in_months(self):
 		for month in Month.objects.all():
 			try:
 				self.assertEquals(Day.objects.filter(month=month).count(), month.days_in_month)
 			except (AssertionError):
 				print(f'Missing days in {month.month_str} {month.year.year}')
+
+	def test_day_validity(self):
+		month = Month.objects.get(year=Year.objects.get(year=2011), month=1)
+		self.day_tester(Day.objects.get(month=month, day_of_month=1), month, 1, 6, 'Saturday')
+
+		month = Month.objects.get(year=Year.objects.get(year=2011), month=2)
+		self.day_tester(Day.objects.get(month=month, day_of_month=28), month, 28, 1, 'Monday')
+
+		month = Month.objects.get(year=Year.objects.get(year=2011), month=11)
+		self.day_tester(Day.objects.get(month=month, day_of_month=25), month, 25, 5, 'Friday')
+
+		month = Month.objects.get(year=Year.objects.get(year=2017), month=1)
+		self.day_tester(Day.objects.get(month=month, day_of_month=28), month, 28, 6, 'Saturday')
+
+		month = Month.objects.get(year=Year.objects.get(year=2017), month=5)
+		self.day_tester(Day.objects.get(month=month, day_of_month=22), month, 22, 1, 'Monday')
+
+		month = Month.objects.get(year=Year.objects.get(year=2018), month=1)
+		self.day_tester(Day.objects.get(month=month, day_of_month=1), month, 1, 1, 'Monday')
+
+		month = Month.objects.get(year=Year.objects.get(year=2018), month=11)
+		self.day_tester(Day.objects.get(month=month, day_of_month=23), month, 23, 5, 'Friday')
 
 if __name__ == '__main__':  
 	unittest.main(warnings='ignore')

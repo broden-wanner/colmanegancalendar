@@ -4,18 +4,18 @@ from django.utils.text import slugify
 import datetime
 
 month_dictionary = {
-	0: 'January',
-	1: 'February',
-	2: 'March',
-	3: 'April',
-	4: 'May',
-	5: 'June',
-	6: 'July',
-	7: 'August',
-	8: 'September',
-	9: 'October',
-	10: 'November',
-	11: 'December',
+	1: 'January',
+	2: 'February',
+	3: 'March',
+	4: 'April',
+	5: 'May',
+	6: 'June',
+	7: 'July',
+	8: 'August',
+	9: 'September',
+	10: 'October',
+	11: 'November',
+	12: 'December',
 }
 
 day_dictionary = {
@@ -67,26 +67,36 @@ class Day(models.Model):
 	def __str__(self):
 		return '%i of %s %i' % (self.day_of_month, self.month.month_str, int(self.month.year.year))
 
+	def sorted_events(self):
+		return self.event_set.order_by('start_time')
+
 	def save(self, *args, **kwargs):
 		self.day_of_week_str = day_dictionary[self.day_of_week]
 		super(Day, self).save(*args, **kwargs)
 
 class Calendar(models.Model):
-	event_calendar = models.CharField(max_length=100)
+	event_calendar = models.CharField(max_length=100, unique=True)
+	slug = models.SlugField(unique=True, blank=True, null=True)
 
 	def __str__(self):
 		return f'{self.event_calendar} Calendar'
 
 	def save(self, *args, **kwargs):
 		self.event_calendar = self.event_calendar.title()
+		self.slug = slugify(self.event_calendar)
 		super(Calendar, self).save(*args, **kwargs)
 
 class Event(models.Model):
 	title = models.CharField(max_length=100)
+	#creator = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+	slug = models.SlugField(unique=False, blank=True, null=True)
 	event_info = models.TextField(blank=True)
 	days = models.ManyToManyField('Day')
-	start_time = models.DateTimeField()
-	end_time = models.DateTimeField()
+	start_date = models.DateField()
+	start_time = models.TimeField()
+	end_date = models.DateField()
+	end_time = models.TimeField()
+	all_day = models.BooleanField(default=False)
 	calendar = models.ForeignKey('Calendar', on_delete=models.CASCADE)
 	date_created = models.DateTimeField(default=timezone.now)
 
@@ -97,13 +107,13 @@ class Event(models.Model):
 		#Gets the first day of the event based on the start time
 		first_day = Day.objects.get(
 						month=Month.objects.get(
-							year=Year.objects.get(year=self.start_time.year),
-							month=self.start_time.month-1
+							year=Year.objects.get(year=self.start_date.year),
+							month=self.start_date.month
 						),
-						day_of_month=self.start_time.day
+						day_of_month=self.start_date.day
 					)
 		#Time difference between dates
-		delta = self.end_time - self.start_time
+		delta = self.end_date - self.start_date
 		#Add the first day to the days of the event
 		self.days.add(first_day)
 		#If the amount of days is greater than one
@@ -114,6 +124,7 @@ class Event(models.Model):
 
 	def save(self, *args, **kwargs):
 		self.title = self.title.title()
+		self.slug = slugify(self.title)
 		self.date_created = timezone.now()
 		super(Event, self).save(*args, **kwargs)
 		self.set_days_of_event()

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+	<h1>New Calendar</h1>
+	<form method="POST" enctype="multipart/form-data">
+		{% csrf_token %}
+		{{ new_calendar_form.as_p }}
+		<button type="submit" value="create_calendar">Create Calendar</button>
+	</form>
+</div>
+
+{% endblock %}

@@ -3,11 +3,11 @@
 {% block content %}
 
 <div class="container">
-	<h1>New Event</h1>
+	<h1>Edit Event</h1>
 	<form method="POST" enctype="multipart/form-data">
 		{% csrf_token %}
-		{{ new_event_form.as_p }}
-		<button type="submit" value="create_event">Create Event</button>
+		{{ event_form.as_p }}
+		<button type="submit" value="edit_event">Edit Event</button>
 	</form>
 	<br>
 	<p>Calendar not showing up? <a href="{% url 'new_calendar' %}">Create a new one.</a></p>

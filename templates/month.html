@@ -6,8 +6,8 @@
 
 <div class="container">
 	<h1>{{ current_month.month_str }} {{ current_month.year.year }}</h1>
-	<a href="{% url 'new_event' %}">+ New Event</a>
-	<br><br>
+	<p><a href="{% url 'new_event' %}">+ New Event</a></p>
+	<p><a href="{% url 'new_calendar' %}">+ New Calendar</a></p>
 	<table class="table table-bordered">
 		<tbody>
 			{% for week in month_weeks %}
@@ -16,12 +16,13 @@
 						<td>{{ day.day_of_month|ordinal }} of {{ day.month.month_str }}
 							<br>
 							<ul>
-								{% for event in day.event_set.all %}
+								{% for event in day.sorted_events %}
 									<li>
-										{% if event.start_time.day == day.day_of_month %}
+										<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}">
+										{% if event.start_date.day == day.day_of_month %}
 											{{ event.start_time|time:'fA' }}
 										{% endif %}
-										{{ event.title }}
+										{{ event.title }}</a>
 									</li>
 								{% endfor %}
 							</ul>
