@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
 {% block content %}
 
 <div class="container">
@@ -7,10 +9,12 @@
 	<form method="POST" enctype="multipart/form-data">
 		{% csrf_token %}
 		{{ event_form.as_p }}
-		<button type="submit" value="edit_event">Edit Event</button>
+		<button type="submit" value="save_event">Save Event</button>
 	</form>
 	<br>
 	<p>Calendar not showing up? <a href="{% url 'new_calendar' %}">Create a new one.</a></p>
 </div>
+
+<script type="text/javascript" src="{% static 'js/eventform.js' %}"></script>
 
 {% endblock %}

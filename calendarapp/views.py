@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.utils import timezone
-from .models import Year, Month, Day, Calendar, Event
+import datetime
+import time
+from .models import Year, Month, Day, Calendar, Event, Location
 from .forms import EventForm, CalendarForm
 
 def calendarHomeView(request):
@@ -59,6 +61,8 @@ def calendarMonthView(request, year, month):
 		'current_month': current_month,
 		'next_month': next_month,
 		'previous_month': previous_month,
+		'calendars': Calendar.objects.all().order_by('event_calendar'),
+		'locations': Location.objects.all().order_by('location')
 	})
 
 def newEventView(request):
@@ -69,7 +73,12 @@ def newEventView(request):
 			new_event.save()
 			return redirect('month', year=new_event.start_date.year, month=new_event.start_date.month)
 	else:
-		new_event_form = EventForm()
+		new_event_form = EventForm(initial={
+			'start_date': timezone.now().strftime('%Y-%m-%d'),
+			'end_date': timezone.now().strftime('%Y-%m-%d'),
+			'start_time': datetime.datetime.now().strftime('%H:%M'),
+			'end_time': (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%H:%M')
+		})
 
 	return render(request, 'new_event.html', {'new_event_form': new_event_form})
 
@@ -90,6 +99,13 @@ def editEventView(request, year, month, day, pk, slug):
 
 	return render(request, 'edit_event.html', {'event_form': event_form})
 
+def deleteEventView(request, year, month, day, pk, slug):
+	event = get_object_or_404(Event, pk=pk, slug=slug)
+	if request.method == 'POST':
+		event.delete()
+		return redirect('month', year=timezone.now().year, month=timezone.now().month)
+	return render(request, 'delete_event.html', {'event': event})
+
 def newCalendarView(request):
 	if request.method == 'POST':
 		new_calendar_form = CalendarForm(request.POST)
@@ -100,3 +116,32 @@ def newCalendarView(request):
 		new_calendar_form = CalendarForm()
 
 	return render(request, 'new_calendar.html', {'new_calendar_form': new_calendar_form})
+
+def calendarView(request, slug):
+	calendar = get_object_or_404(Calendar, slug=slug)
+	events = Event.objects.filter(calendar=calendar).order_by('start_date', 'start_time')
+	return render(request, 'calendar_view.html', {'calendar': calendar, 'events': events})
+
+def editCalendarView(request, slug):
+	calendar = get_object_or_404(Calendar, slug=slug)
+	if request.method == "POST":
+		calendar_form = CalendarForm(request.POST, instance=calendar)
+		if calendar_form.is_valid():
+			calendar = calendar_form.save(commit=False)
+			calendar.save()
+			return redirect('calendar_view', slug=calendar.slug)
+	else:
+		calendar_form = CalendarForm(instance=calendar)
+	return render(request, 'edit_calendar.html', {'calendar_form': calendar_form})
+
+def deleteCalendarView(request, slug):
+	calendar = get_object_or_404(Calendar, slug=slug)
+	if request.method == "POST":
+		calendar.delete()
+		return redirect('month', year=timezone.now().year, month=timezone.now().month)
+	return render(request, 'delete_calendar.html', {'calendar': calendar})
+
+def locationView(request, slug):
+	location = get_object_or_404(Location, slug=slug)
+	events = Event.objects.filter(location=location).order_by('start_date', 'start_time')
+	return render(request, 'location_view.html', {'location': location, 'events': events})

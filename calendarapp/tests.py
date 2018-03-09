@@ -184,14 +184,27 @@ class AppTests(TestCase):
 	def test_uses_new_event_template(self):
 		response = self.client.get('/event/new')
 		self.assertTemplateUsed(response, 'new_event.html')
+		self.assertTemplateUsed(response, 'base.html')
 
 	##
-	## New Calendar View Tests
+	## Edit Event View Tests
 	##
 
-	def test_uses_new_calendar_template(self):
-		response = self.client.get('/calendar/new')
-		self.assertTemplateUsed(response, 'new_calendar.html')
+	def test_uses_edit_event_template(self):
+		event = self.create_random_event_under_random_category()
+		response = self.client.get(f'/event/{event.start_date.year}/{event.start_date.month}/{event.start_date.day}/{event.pk}/{event.slug}/edit')
+		self.assertTemplateUsed(response, 'edit_event.html')
+		self.assertTemplateUsed(response, 'base.html')
+
+	##
+	## Delete Event View Tests
+	##
+
+	def test_uses_delete_event_template(self):
+		event = self.create_random_event_under_random_category()
+		response = self.client.get(f'/event/{event.start_date.year}/{event.start_date.month}/{event.start_date.day}/{event.pk}/{event.slug}/delete')
+		self.assertTemplateUsed(response, 'delete_event.html')
+		self.assertTemplateUsed(response, 'base.html')
 
 	##
 	## Event View Tests
@@ -201,6 +214,7 @@ class AppTests(TestCase):
 		event = self.create_random_event_under_random_category()
 		response = self.client.get(f'/event/{event.start_date.year}/{event.start_date.month}/{event.start_date.day}/{event.pk}/{event.slug}/')
 		self.assertTemplateUsed(response, 'event_view.html')
+		self.assertTemplateUsed(response, 'base.html')
 
 	def test_event_view_displays_correct_data(self):
 		event = self.create_random_event_under_random_category()
@@ -213,6 +227,16 @@ class AppTests(TestCase):
 		event = self.create_random_event_under_random_category()
 		response = self.client.get(f'/event/{event.start_date.year}/{event.start_date.month}/{event.start_date.day}/{event.pk}/{event.slug}/')
 		self.assertEquals(response.context['event'], event)
+
+	##
+	## New Calendar View Tests
+	##
+
+	def test_uses_new_calendar_template(self):
+		response = self.client.get('/calendar/new')
+		self.assertTemplateUsed(response, 'new_calendar.html')
+		self.assertTemplateUsed(response, 'base.html')
+
 
 	##
 	## Calendar and Event Testers

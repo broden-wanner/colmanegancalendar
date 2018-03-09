@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+	<h1>Delete Event</h1>
+	<form method="POST">
+		{% csrf_token %}
+		<p>Are you sure you want to delete the {{ calendar.event_calendar }} calendar? It will remove all events associated with the calendar.</p>
+		<button type="submit" value="delete_calendar">Yes</button>
+		<button type="button" onclick="window.location.href='{% url 'calendar_view' slug=calendar.slug %}'">No</button>
+	</form>
+</div>
+
+{% endblock %}

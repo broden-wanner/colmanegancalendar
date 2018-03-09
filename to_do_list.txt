@@ -1,9 +1,9 @@
-0. Build tests for existing views
-1. Add delete event View
-1/2. Add edit and delete views for calendars
-2. Validate event data
-2 1/2. Add day view
+1. Add capability for adding weekly, daily, etc.
+2. Add day view
 3. Add better date-picker abilites
 4. Add colors for calendars
 5. Allow filtering of calendars in urls
+	- Have tab on left to choose calendar
 6. Perhaps add week view
+7. Add user accounts
+8. Finally, style!

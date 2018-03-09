@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
 {% block content %}
 
 <div class="container">
@@ -12,5 +14,7 @@
 	<br>
 	<p>Calendar not showing up? <a href="{% url 'new_calendar' %}">Create a new one.</a></p>
 </div>
+
+<script type="text/javascript" src="{% static 'js/eventform.js' %}"></script>
 
 {% endblock %}

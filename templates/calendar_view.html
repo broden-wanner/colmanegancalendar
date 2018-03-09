@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+	<h1>{{ calendar.event_calendar }} Calendar</h1>
+	<p>Events asscociated with this calendar:</p>
+	{% if not events %}
+		<p>None</p>
+	{% else %}
+		<ul>
+			{% for event in events %}
+				<li><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">{{ event.start_date|date:'n/j/y' }} {{ event.start_time|date:'f a' }} {{ event.title }}</a></li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+	<p><a href="{% url 'new_event' %}">Add an event to the calendar</a></p>
+	<p><a href="{% url 'edit_calendar' slug=calendar.slug %}">Edit Calendar</a></p>
+	<p><a href="{% url 'delete_calendar' slug=calendar.slug %}">Delete Calendar</a></p>
+</div>
+
+{% endblock %}
