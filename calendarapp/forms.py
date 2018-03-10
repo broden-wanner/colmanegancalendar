@@ -61,8 +61,8 @@ class EventForm(forms.ModelForm):
 
 	def clean(self):
 		cleaned_data = super().clean()
-		repeating_fields = ['repeat', 'repeat_every', 'duration', 'repeat_on', 'ends_on', 'ends_after']
-		
+		repeating_fields = ['repeat', 'repeat_every', 'duration', 'repeat_on']
+
 		repeating_fields_cleaned_data = []
 		for field in repeating_fields:
 			repeating_fields_cleaned_data.append(cleaned_data.get(field))
@@ -71,6 +71,23 @@ class EventForm(forms.ModelForm):
 		for i in range(1, len(repeating_fields)):
 			if repeating_fields_cleaned_data[0] and not repeating_fields_cleaned_data[i]:
 				self.add_error(repeating_fields[i], msg)
+
+		ends_on = cleaned_data.get('ends_on')
+		ends_after = cleaned_data.get('ends_after')
+		if repeating_fields_cleaned_data[0] and not ends_on and not ends_after:
+			self.add_error('ends_on', 'Fill in either this field or the "Ends After" field')
+			self.add_error('ends_after', 'Fill in either this field or the "Ends On" field')
+		if repeating_fields_cleaned_data[0] and ends_on and ends_after:
+			self.add_error('ends_on', 'Fill in either this field or the "Ends After" field')
+			self.add_error('ends_after', 'Fill in either this field or the "Ends On" field')
+
+		if ends_after:
+			if ends_after <= 0:
+				self.add_error('ends_after', 'Must be a postive integer')
+
+		if repeating_fields_cleaned_data[1]:
+			if repeating_fields_cleaned_data[1] <= 0:
+				self.add_error(repeating_fields[1], 'Must be a postive integer')
 
 class CalendarForm(forms.ModelForm):
 

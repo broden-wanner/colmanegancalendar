@@ -77,7 +77,11 @@ def newEventView(request):
 			'start_date': timezone.now().strftime('%Y-%m-%d'),
 			'end_date': timezone.now().strftime('%Y-%m-%d'),
 			'start_time': datetime.datetime.now().strftime('%H:%M'),
-			'end_time': (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%H:%M')
+			'end_time': (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%H:%M'),
+			'repeat_every': 1,
+			'duration': 2,
+			'repeat_on': datetime.datetime.now().isoweekday(),
+			'ends_on': (datetime.datetime.now() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')
 		})
 
 	return render(request, 'new_event.html', {'new_event_form': new_event_form})

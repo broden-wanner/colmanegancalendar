@@ -6,4 +6,5 @@
 	- Have tab on left to choose calendar
 6. Perhaps add week view
 7. Add user accounts
-8. Finally, style!
+8. Add email
+9. Finally, style!
