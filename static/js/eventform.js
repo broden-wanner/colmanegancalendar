@@ -20,8 +20,12 @@ $allDayBox.click(function() {
 	}
 });
 
+
+
 //Append 'occurences' to ends_after input box
 $('input[name="ends_after"]').parent().append(" occurences");
+
+
 
 //Handles displaying of recurring event menu
 var $repeatCheckBox = $('input[name="repeat"]');
@@ -33,8 +37,7 @@ for(var i = 0; i < repeatingFields.length; i++) {
 	repeatingFieldObjects.push($(stringOfField).parent());
 }
 
-repeatingFieldObjects.push($('label:contains("Duration:")'));
-repeatingFieldObjects.push($("#id_duration"));
+repeatingFieldObjects.push($('select[name="duration"]').parent());
 repeatingFieldObjects.push($('label:contains("Repeat on:")'));
 repeatingFieldObjects.push($("#id_repeat_on"));
 
@@ -47,7 +50,11 @@ if(!$repeatCheckBox.is(":checked")){
 $repeatCheckBox.click(function() {
 	if(this.checked) {
 		for(var i = 0; i < repeatingFieldObjects.length; i++) {
-			repeatingFieldObjects[i].show(showHideDuration);
+			if(i != 4 && i != 5) {
+				repeatingFieldObjects[i].show(showHideDuration);
+			} else if((i == 4 || i == 5) && $('select[name="duration"]').val() != 1) {
+				repeatingFieldObjects[i].show(showHideDuration);
+			}
 		}
 	} else {
 		for(var i = 0; i < repeatingFieldObjects.length; i++) {
@@ -56,34 +63,51 @@ $repeatCheckBox.click(function() {
 	}
 });
 
+
+
+
 //Handles the checking of the duration field
-var $dayAndMonthDuration = $('input:radio[value="1"], input:radio[value="3"]');
-if($dayAndMonthDuration.is(":checked")) {
-	$('label:contains("Repeat on:")').hide();
-	$("#id_repeat_on").hide();
-}
-$dayAndMonthDuration.click(function() {
-	if(this.checked) {
+var $durationSelector = $('select[name="duration"]');
+
+function toggleRepeatOn(showhide) {
+	if(showhide == "hide") {
 		$('label:contains("Repeat on:")').hide(showHideDuration);
 		$("#id_repeat_on").hide(showHideDuration);
+	} else if (showhide == "show") {
+		$('label:contains("Repeat on:")').show(showHideDuration);
+		$("#id_repeat_on").show(showHideDuration);
+	} else if (showhide == "immediately hide") {
+		$('label:contains("Repeat on:")').hide();
+		$("#id_repeat_on").hide();
+	}
+}
+
+if($durationSelector.val() == 1 || $durationSelector.val() == 3) {
+	toggleRepeatOn("immediately hide");
+}
+
+$durationSelector.click(function() {
+	if($(this).val() == 1 || $(this).val() == 3) {
+		toggleRepeatOn("hide");
+	} else if ($(this).val() == 2) {
+		toggleRepeatOn("show");
 	}
 });
 
-var $weekDuration = $('input:radio[value="2"]');
-if($weekDuration.is(":checked") && $repeatCheckBox.is(":checked")) {
-	$('label:contains("Repeat on:")').show();
-	$("#id_repeat_on").show();
-}
-$weekDuration.click(function() {
-	if(this.checked) {
-		$('label:contains("Repeat on:")').show(showHideDuration);
-		$("#id_repeat_on").show(showHideDuration);
-	}
-});
+
+
 
 //Handles the ends_on and ends_after fields
 var $endsOn = $('input[name="ends_on"]');
-var $endsAfter = $('input[name="ends_after"]').css("background-color", "LightGrey");
+var $endsAfter = $('input[name="ends_after"]');
+if ($endsOn.val() == "" && $endsAfter.val() == "") {
+	$endsAfter.css("background-color", "LightGrey");
+} else if($endsOn.val() == "" && $endsAfter.val() != "") {
+	$endsOn.css("background-color", "LightGrey");
+} else {
+	$endsAfter.css("background-color", "LightGrey");
+}
+
 $endsOn.focusin(function() {
 	$endsOn.css("background-color", "white");
 	$endsAfter.val("").css("background-color", "LightGrey");

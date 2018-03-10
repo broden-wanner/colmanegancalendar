@@ -8,7 +8,19 @@
 		<p>Location: {{ event.location.location }}</p>
 		<p>Starts: {{ event.start_date }}{% if not event.all_day %}, {{ event.start_time }}{% endif %}</p>
 		<p>Ends: {{ event.end_date }}{% if not event.all_day %}, {{ event.end_time }}{% endif %}</p>
-		<p>All day: {{ event.all_day|yesno:'Yes, No' }}
+		<p>All day: {{ event.all_day|yesno:'Yes, No' }}</p>
+		<p>Repeats: {{ event.repeat|yesno:'Yes, No' }}</p>
+		{% if event.repeat %}
+			<p>Repeats every {{ event.repeat_every }} {{ event.get_duration_display }}</p>
+			{% if repeat_on %}
+				<p>Repeats on {% for day in event.repeat_on.all %}{{ day.day_of_week }}{% if not forloop.last %},{% endif%}{% endfor %}</p>
+			{% endif %}
+			{% if event.ends_on %}
+				<p>Ends on {{ event.ends_on }}</p>
+			{% elif event.ends_after %}
+				<p>Ends after {{ event.ends_after }} occurences</p>
+			{% endif %}
+		{% endif %}
 		<p>Date Created: {{ event.date_created }}</p>
 		<p><a href="{% url 'edit_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Edit Event</a></p>
 		<p><a href="{% url 'delete_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Delete Event</a></p>

@@ -69,8 +69,7 @@ def newEventView(request):
 	if request.method == 'POST':
 		new_event_form = EventForm(request.POST)
 		if new_event_form.is_valid():
-			new_event = new_event_form.save(commit=False)
-			new_event.save()
+			new_event = new_event_form.save(commit=True)
 			return redirect('month', year=new_event.start_date.year, month=new_event.start_date.month)
 	else:
 		new_event_form = EventForm(initial={
@@ -80,7 +79,7 @@ def newEventView(request):
 			'end_time': (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%H:%M'),
 			'repeat_every': 1,
 			'duration': 2,
-			'repeat_on': datetime.datetime.now().isoweekday(),
+			'repeat_on': timezone.now().isoweekday() + 1,
 			'ends_on': (datetime.datetime.now() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')
 		})
 
@@ -95,8 +94,7 @@ def editEventView(request, year, month, day, pk, slug):
 	if request.method == 'POST':
 		event_form = EventForm(request.POST, instance=event)
 		if event_form.is_valid():
-			event = event_form.save(commit=False)
-			event.save()
+			event = event_form.save(commit=True)
 			return redirect('month', year=event.start_date.year, month=event.start_date.month)
 	else:
 		event_form = EventForm(instance=event)

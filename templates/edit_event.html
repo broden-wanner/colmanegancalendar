@@ -15,6 +15,10 @@
 	<p>Calendar not showing up? <a href="{% url 'new_calendar' %}">Create a new one.</a></p>
 </div>
 
+{% if new_event_form.errors %}
+<script type="text/javascript">alert("Address the following error messages")</script>
+{% endif %}
+
 <script type="text/javascript" src="{% static 'js/eventform.js' %}"></script>
 
 {% endblock %}

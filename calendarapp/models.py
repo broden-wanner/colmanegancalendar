@@ -103,6 +103,12 @@ class Location(models.Model):
 		self.slug = slugify(self.location)
 		super(Location, self).save(*args, **kwargs)
 
+class DayOfWeek(models.Model):
+	day_of_week = models.CharField(max_length=20)
+
+	def __str__(self):
+		return self.day_of_week
+
 class Event(models.Model):
 	title = models.CharField(max_length=100)
 	#creator = models.ForeignKey('auth.User', on_delete=models.CASCADE)
@@ -117,6 +123,17 @@ class Event(models.Model):
 	all_day = models.BooleanField(default=False)
 	calendar = models.ForeignKey('Calendar', on_delete=models.CASCADE)
 	date_created = models.DateTimeField(default=timezone.now)
+	#Repeating fields
+	repeat = models.BooleanField(default=False)
+	repeat_every = models.PositiveIntegerField(default=1, blank=True, null=True)
+	duration = models.CharField(
+		max_length=1,
+		blank=True,
+		choices=(('1', 'Days'), ('2', 'Weeks'), ('3', 'Months'))
+	)
+	repeat_on = models.ManyToManyField('DayOfWeek', blank=True)
+	ends_on = models.DateField(blank=True, null=True)
+	ends_after = models.PositiveIntegerField(blank=True, null=True)
 
 	def __str__(self):
 		return self.title
@@ -132,15 +149,37 @@ class Event(models.Model):
 					)
 		#Time difference between dates
 		delta = self.end_date - self.start_date
-		#Add the first day to the days of the event
-		self.days.add(first_day)
-		#If the amount of days is greater than one
-		if delta > datetime.timedelta(days=0):
-			set_of_days = Day.objects.filter(id__gt=first_day.id, id__lte=first_day.id + delta.days)
-			for day in set_of_days:
-				self.days.add(day)
+		#Adds days based on date
+		new_set_of_days = Day.objects.filter(id__gte=first_day.id, id__lte=first_day.id + delta.days)
+		for day in new_set_of_days:
+			self.days.add(day)
+
+		#Handles recurrence
+		recurring_days = []
+		if self.repeat:
+			#Skipping by days
+			if self.duration == '1':
+				#If set to end on a certain day
+				if self.ends_on:
+					recurring_days = Day.objects.filter(id__gte=first_day.id, id__lte=first_day.id + (self.ends_on - self.start_date).days)[self.repeat_every::self.repeat_every]
+					for day in recurring_days:
+						self.days.add(day)
+				#If set to end after so many occurences
+				elif self.ends_after:
+					recurring_days = Day.objects.filter(id__gte=first_day.id, id__lte=first_day.id + (self.ends_after - 1)*self.repeat_every)[self.repeat_every::self.repeat_every]
+					for day in recurring_days:
+						self.days.add(day)
+			#Skipping by weeks
+
+		#If change, removes days that were not in the new day set
+		previous_day_set = self.days.all()
+		for day in previous_day_set:
+			if day not in list(chain(new_set_of_days, recurring_days)):
+				self.days.remove(day)
+
 
 	def clean(self):
+		#Check to ensure the dates don't come before one another
 		if self.start_date > self.end_date:
 			raise ValidationError({
 				'start_date': 'Start date must be less than or equal to end date.',
@@ -151,6 +190,36 @@ class Event(models.Model):
 				'start_time':'Start time must be less than end time.',
 				'end_time': 'End time must be greater than start time.'
 			})
+
+		#Check recurring fields
+		msg = 'If repeating event, must fill in this field'
+		if self.repeat and not self.repeat_every:
+			raise ValidationError({'repeat_every': msg})
+		if self.repeat and not self.duration:
+			raise ValidationError({'duration': msg})
+
+		#If the event lasts more than 2 days and the user tries to repeat daily
+		if self.repeat and self.duration == '1' and self.end_date.day - self.start_date.day >= 1:
+			raise ValidationError({'duration': 'If repeating daily, the event may only last one day'})
+
+		if self.repeat and not self.ends_on and not self.ends_after:
+			raise ValidationError({'ends_on': 'Fill in either this field or the "Ends After" field'})
+			raise ValidationError({'ends_after': 'Fill in either this field or the "Ends On" field'})
+		if self.repeat and self.ends_on and self.ends_after:
+			raise ValidationError({'ends_on': 'Fill in either this field or the "Ends After" field'})
+			raise ValidationError({'ends_after': 'Fill in either this field or the "Ends On" field'})
+
+		if self.repeat and self.ends_after:
+			if self.ends_after <= 0:
+				raise ValidationError({'ends_after': 'Must be a postive integer'})
+
+		if self.repeat and self.repeat_every:
+			if self.repeat_every <= 0:
+				raise ValidationError({'repeat_every': 'Must be a postive integer'})
+
+		if self.repeat and self.ends_on:
+			if self.ends_on <= self.start_date:
+				raise ValidationError({'ends_on': 'Must be later than the start date'})
 
 	def save(self, *args, **kwargs):
 		self.title = self.title.title()

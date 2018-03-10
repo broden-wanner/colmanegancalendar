@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ValidationError
-from .models import Event, Calendar
+from .models import Event, Calendar, DayOfWeek
 
 class EventForm(forms.ModelForm):
 	start_date = forms.DateField(
@@ -25,13 +25,8 @@ class EventForm(forms.ModelForm):
 		widget=forms.NumberInput(attrs={'type': 'number', 'min': 1}),
 		required=False
 	)
-	duration = forms.ChoiceField(
-		choices=[('1', 'Days'), ('2', 'Weeks'), ('3', 'Months')],
-		widget=forms.RadioSelect(),
-		required=False
-	)
-	repeat_on = forms.MultipleChoiceField(
-		choices=[('0', 'Sun'), ('1', 'Mon'), ('2', 'Tue'), ('3', 'Wed'), ('4', 'Thu'), ('5', 'Fri'), ('6', 'Sat')],
+	repeat_on = forms.ModelMultipleChoiceField(
+		queryset=DayOfWeek.objects.all(),
 		widget=forms.CheckboxSelectMultiple(),
 		required=False
 	)
@@ -57,37 +52,23 @@ class EventForm(forms.ModelForm):
 			'end_date',
 			'end_time',
 			'all_day',
+			'repeat',
+			'repeat_every',
+			'duration',
+			'repeat_on',
+			'ends_on',
+			'ends_after'
 		)
 
 	def clean(self):
 		cleaned_data = super().clean()
-		repeating_fields = ['repeat', 'repeat_every', 'duration', 'repeat_on']
+		repeat = cleaned_data.get('repeat')
+		duration = cleaned_data.get('duration')
+		repeat_on = cleaned_data.get('repeat_on')
 
-		repeating_fields_cleaned_data = []
-		for field in repeating_fields:
-			repeating_fields_cleaned_data.append(cleaned_data.get(field))
-
-		msg = 'If repeating event, must fill in this field'
-		for i in range(1, len(repeating_fields)):
-			if repeating_fields_cleaned_data[0] and not repeating_fields_cleaned_data[i]:
-				self.add_error(repeating_fields[i], msg)
-
-		ends_on = cleaned_data.get('ends_on')
-		ends_after = cleaned_data.get('ends_after')
-		if repeating_fields_cleaned_data[0] and not ends_on and not ends_after:
-			self.add_error('ends_on', 'Fill in either this field or the "Ends After" field')
-			self.add_error('ends_after', 'Fill in either this field or the "Ends On" field')
-		if repeating_fields_cleaned_data[0] and ends_on and ends_after:
-			self.add_error('ends_on', 'Fill in either this field or the "Ends After" field')
-			self.add_error('ends_after', 'Fill in either this field or the "Ends On" field')
-
-		if ends_after:
-			if ends_after <= 0:
-				self.add_error('ends_after', 'Must be a postive integer')
-
-		if repeating_fields_cleaned_data[1]:
-			if repeating_fields_cleaned_data[1] <= 0:
-				self.add_error(repeating_fields[1], 'Must be a postive integer')
+		#'2' corresponds to 'weeks' in the duration choice field
+		if repeat and duration == '2' and not repeat_on:
+			self.add_error('repeat_on', 'If repeating weekly, this field must be filled')
 
 class CalendarForm(forms.ModelForm):
 
