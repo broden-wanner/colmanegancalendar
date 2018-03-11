@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, get_list_or_40
 from django.utils import timezone
 import datetime
 import time
-from .models import Year, Month, Day, Calendar, Event, Location
+from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
 from .forms import EventForm, CalendarForm
 
 def calendarHomeView(request):
@@ -100,8 +100,8 @@ def newEventView(request):
 			'end_time': (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%H:%M'),
 			'repeat_every': 1,
 			'duration': 2,
-			'repeat_on': timezone.now().isoweekday() + 1,
-			'ends_on': (datetime.datetime.now() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+			'repeat_on': get_object_or_404(DayOfWeek, day_int=datetime.datetime.now().weekday()),
+			'ends_on': (datetime.datetime.now() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'),
 		})
 
 	return render(request, 'new_event.html', {'new_event_form': new_event_form})
