@@ -1,8 +1,6 @@
 3. Add better date-picker abilites
-4. Add colors for calendars
 5. Allow filtering of calendars in urls
 	- Have tab on left to choose calendar
-6. Perhaps add week view
 7. Add user accounts
 8. Add email
 9. Finally, style!

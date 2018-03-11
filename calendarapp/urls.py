@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
 	path('', views.calendarHomeView, name='home'),
 	path('month/<int:year>/<int:month>/', views.calendarMonthView, name='month'),
+	path('week/<int:year>/<int:month>/<int:first_day_of_week>/', views.calendarWeekView, name='week'),
 	path('day/<int:year>/<int:month>/<int:day>/', views.calendarDayView, name='day'),
 	path('event/new', views.newEventView, name='new_event'),
 	path('event/<int:year>/<int:month>/<int:day>/<int:pk>/<slug:slug>/', views.calendarEventView, name='event_view'),

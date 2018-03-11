@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .forms import EventForm
+from .forms import EventForm, CalendarForm
 from .models import Calendar, Event, Location
 
 class EventAdmin(admin.ModelAdmin):
@@ -8,6 +8,7 @@ class EventAdmin(admin.ModelAdmin):
 
 class CalendarAdmin(admin.ModelAdmin):
 	exclude = ('slug',)
+	form = CalendarForm
 
 class LocationAdmin(admin.ModelAdmin):
 	exclude = ('slug',)

@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="container">
-	<h1>{{ calendar.event_calendar }} Calendar</h1>
+	<h1 style="background-color: {{ calendar.color }};">{{ calendar.event_calendar }} Calendar</h1>
 	<p>Events asscociated with this calendar:</p>
 	{% if not events %}
 		<p>None</p>

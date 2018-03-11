@@ -80,6 +80,7 @@ class Day(models.Model):
 class Calendar(models.Model):
 	event_calendar = models.CharField(max_length=100, unique=True)
 	#creator = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+	color = models.CharField(max_length=7, unique=True, null=True)
 	slug = models.SlugField(unique=True, blank=True, null=True)
 
 	def __str__(self):

@@ -71,7 +71,10 @@ class EventForm(forms.ModelForm):
 			self.add_error('repeat_on', 'If repeating weekly, this field must be filled')
 
 class CalendarForm(forms.ModelForm):
+	color = forms.CharField(
+		widget=forms.TextInput(attrs={'type': 'color'})
+	)
 
 	class Meta:
 		model = Calendar
-		fields = ('event_calendar',)
+		fields = ('event_calendar', 'color')

@@ -8,6 +8,7 @@
 	<h1>{{ current_month.month_str }} {{ current_month.year.year }}</h1>
 	<p><a href="{% url 'new_event' %}">+ New Event</a></p>
 	<p><a href="{% url 'new_calendar' %}">+ New Calendar</a></p>
+	<p><a href="{% url 'week' year=month_weeks.0.0.month.year.year month=month_weeks.0.0.month.month first_day_of_week=month_weeks.0.0.day_of_month %}">Week View</a></p>
 	<table class="table table-bordered">
 		<tbody>
 			{% for week in month_weeks %}
@@ -32,8 +33,8 @@
 			{% endfor %}
 		</tbody>
 	</table>
-	<a href="{% url 'month' year=next_month.year.year month=next_month.month %}">Next Month: {{ next_month.month_str }} {{ next_month.year.year }}</a> <br>
-	<a href="{% url 'month' year=previous_month.year.year month=previous_month.month %}">Previous Month: {{ previous_month.month_str }} {{ previous_month.year.year }}</a>
+	<p><a href="{% url 'month' year=next_month.year.year month=next_month.month %}">Next Month: {{ next_month.month_str }} {{ next_month.year.year }}</a></p>
+	<p><a href="{% url 'month' year=previous_month.year.year month=previous_month.month %}">Previous Month: {{ previous_month.month_str }} {{ previous_month.year.year }}</a></p>
 
 	<h2>Calendars</h2>
 	<ul>

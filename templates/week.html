@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+
+<div class="container">
+	<h1>Week of {{ week.first.month.month_str }} {{ week.first.day_of_month|ordinal }}, {{ week.first.month.year.year }}</h1>
+	<table class="table table-bordered">
+		<tr>
+			{% for day in week %}
+				<th><a href="{% url 'day' year=day.month.year.year month=day.month.month day=day.day_of_month %}">{{ day.day_of_week_str }}, {{ day.month.month_str }} {{ day.day_of_month|ordinal }}</a></th>
+			{% endfor %}
+		</tr>
+		<tr>
+			{% for day in week %}
+				<td>
+					{% if not day.sorted_events %}
+						<p>No events scheduled</p>
+					{% else %}
+					<ul>
+						{% for event in day.sorted_events %}
+							<li>
+								<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}">
+								{% if not event.all_day%}
+									{{ event.start_time|time:'f A' }}
+								{% endif %}
+								{{ event.title }} {% if event.all_day %}(All-day){% endif %}</a>
+							</li>
+						{% endfor %}
+					</ul>
+					{% endif %}
+				</td>
+			{% endfor %}
+		</tr>
+	</table>
+
+	<p><a href="{% url 'week' year=first_day_of_next_week.month.year.year month=first_day_of_next_week.month.month first_day_of_week=first_day_of_next_week.day_of_month %}">Next Week</a></p>
+	<p><a href="{% url 'week' year=first_day_of_last_week.month.year.year month=first_day_of_last_week.month.month first_day_of_week=first_day_of_last_week.day_of_month %}">Last Week</a></p>
+</div>
+
+{% endblock %}

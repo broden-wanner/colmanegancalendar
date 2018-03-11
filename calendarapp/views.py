@@ -65,6 +65,26 @@ def calendarMonthView(request, year, month):
 		'locations': Location.objects.all().order_by('location')
 	})
 
+def calendarWeekView(request, year, month, first_day_of_week):
+	this_year = get_object_or_404(Year, year=year)
+	this_month = get_object_or_404(Month, year=this_year, month=month)
+	first_day = get_object_or_404(Day, month=this_month, day_of_month=first_day_of_week)
+	week = Day.objects.filter(id__gte=first_day.id, id__lte=first_day.id + 6)
+	first_day_of_next_week = get_object_or_404(Day, pk=first_day.id+7)
+	first_day_of_last_week = get_object_or_404(Day, pk=first_day.id-7)
+
+	return render(request, 'week.html', {
+		'week': week,
+		'first_day_of_next_week': first_day_of_next_week,
+		'first_day_of_last_week': first_day_of_last_week
+	})
+
+def calendarDayView(request, year, month, day):
+	this_year = get_object_or_404(Year, year=year)
+	this_month = get_object_or_404(Month, year=this_year, month=month)
+	this_day = get_object_or_404(Day, month=this_month, day_of_month=day)
+	return render(request, 'day.html', {'day': this_day})
+
 def newEventView(request):
 	if request.method == 'POST':
 		new_event_form = EventForm(request.POST)
@@ -85,13 +105,6 @@ def newEventView(request):
 		})
 
 	return render(request, 'new_event.html', {'new_event_form': new_event_form})
-
-def calendarDayView(request, year, month, day):
-	this_year = get_object_or_404(Year, year=year)
-	this_month = get_object_or_404(Month, year=this_year, month=month)
-	this_day = get_object_or_404(Day, month=this_month, day_of_month=day)
-	return render(request, 'day.html', {'day': this_day})
-
 
 def calendarEventView(request, year, month, day, pk, slug):
 	event = get_object_or_404(Event, pk=pk, slug=slug)
