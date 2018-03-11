@@ -13,7 +13,7 @@
 			{% for week in month_weeks %}
 				<tr>
 					{% for day in week %}
-						<td>{{ day.day_of_month|ordinal }} of {{ day.month.month_str }}
+						<td><a href="{% url 'day' year=day.month.year.year month=day.month.month day=day.day_of_month %}">{{ day.day_of_month|ordinal }} of {{ day.month.month_str }}</a>
 							<br>
 							<ul>
 								{% for event in day.sorted_events %}

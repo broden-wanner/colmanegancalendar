@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+
+<div class="container">
+	<h1>{{ day.day_of_week_str }}, {{ day.month.month_str }} {{ day.day_of_month|ordinal }}, {{ day.month.year.year }}</h1>
+	<p>Events happening on this day:</p>
+	{% if not day.sorted_events %}
+		<p>None</p>
+	{% else %}
+		<ul>
+			{% for event in day.sorted_events %}
+				<li><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">{{ event.start_date|date:'n/j/y' }} {{ event.start_time|date:'f a' }} {{ event.title }}</a></li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+</div>
+
+{% endblock %}

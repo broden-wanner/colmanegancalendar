@@ -86,6 +86,13 @@ def newEventView(request):
 
 	return render(request, 'new_event.html', {'new_event_form': new_event_form})
 
+def calendarDayView(request, year, month, day):
+	this_year = get_object_or_404(Year, year=year)
+	this_month = get_object_or_404(Month, year=this_year, month=month)
+	this_day = get_object_or_404(Day, month=this_month, day_of_month=day)
+	return render(request, 'day.html', {'day': this_day})
+
+
 def calendarEventView(request, year, month, day, pk, slug):
 	event = get_object_or_404(Event, pk=pk, slug=slug)
 	return render(request, 'event_view.html', {'event': event})

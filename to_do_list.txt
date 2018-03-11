@@ -1,4 +1,3 @@
-2. Add day view
 3. Add better date-picker abilites
 4. Add colors for calendars
 5. Allow filtering of calendars in urls
