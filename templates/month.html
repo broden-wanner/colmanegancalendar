@@ -19,7 +19,7 @@
 								{% for event in day.sorted_events %}
 									<li>
 										<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}">
-										{% if event.start_date.day == day.day_of_month and not event.all_day%}
+										{% if not event.all_day%}
 											{{ event.start_time|time:'f A' }}
 										{% endif %}
 										{{ event.title }} {% if event.all_day %}(All-day){% endif %}</a>

@@ -11,10 +11,7 @@
 		<p>All day: {{ event.all_day|yesno:'Yes, No' }}</p>
 		<p>Repeats: {{ event.repeat|yesno:'Yes, No' }}</p>
 		{% if event.repeat %}
-			<p>Repeats every {{ event.repeat_every }} {{ event.get_duration_display }}</p>
-			{% if repeat_on %}
-				<p>Repeats on {% for day in event.repeat_on.all %}{{ day.day_of_week }}{% if not forloop.last %},{% endif%}{% endfor %}</p>
-			{% endif %}
+			<p>Repeats every {{ event.repeat_every }} {{ event.get_duration_display }}{% if event.repeat_on and event.get_duration_display == 'Weeks' %} on {% for day in event.repeat_on.all %}{{ day.day_of_week }}{% if not forloop.last %}, {% endif%}{% endfor %}{% endif %}</p>
 			{% if event.ends_on %}
 				<p>Ends on {{ event.ends_on }}</p>
 			{% elif event.ends_after %}

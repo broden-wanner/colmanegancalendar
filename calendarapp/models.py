@@ -105,6 +105,7 @@ class Location(models.Model):
 
 class DayOfWeek(models.Model):
 	day_of_week = models.CharField(max_length=20)
+	day_int = models.IntegerField(default=0)
 
 	def __str__(self):
 		return self.day_of_week
@@ -170,6 +171,45 @@ class Event(models.Model):
 					for day in recurring_days:
 						self.days.add(day)
 			#Skipping by weeks
+			elif self.duration == '2':
+				this_week = 0
+				day_counter = 1
+				#If set to end on a certain day
+				if self.ends_on:
+					temp_recurring_days = Day.objects.filter(id__gt=first_day.id, id__lte=first_day.id + (self.ends_on - self.start_date).days)
+					for day in temp_recurring_days:
+						for day_to_repeat_on in self.repeat_on.all():
+							if day.day_of_week == day_to_repeat_on.day_int and this_week % self.repeat_every == 0:
+								recurring_days.append(day)
+								self.days.add(day)
+						day_counter += 1
+						if day_counter % 7 == 0:
+							this_week += 1
+						
+				#If set to end after so many occurences
+				elif self.ends_after:
+					temp_recurring_days = Day.objects.filter(id__gt=first_day.id, id__lte=first_day.id + (self.ends_after - 1)*self.repeat_every*7 + (self.repeat_on.last().day_int - first_day.day_of_week))
+					for day in temp_recurring_days:
+						for day_to_repeat_on in self.repeat_on.all():
+							if day.day_of_week == day_to_repeat_on.day_int and this_week % self.repeat_every == 0:
+								recurring_days.append(day)
+								self.days.add(day)
+						day_counter += 1
+						if day_counter % 7 == 0:
+							this_week += 1
+			#Skipping months
+			elif self.duration == '3':
+				#If set to end on a certain day
+				if self.ends_on:
+					recurring_days = Day.objects.filter(id__gte=first_day.id, id__lte=first_day.id + (self.ends_on - self.start_date).days, day_of_month=first_day.day_of_month)[self.repeat_every::self.repeat_every]
+					for day in recurring_days:
+						self.days.add(day)
+				#If set to end after so many occurences
+				if self.ends_after:
+					recurring_days = Day.objects.filter(id__gte=first_day.id, day_of_month=first_day.day_of_month)[self.repeat_every::self.repeat_every]
+					recurring_days = recurring_days[:self.ends_after-1]
+					for day in recurring_days:
+						self.days.add(day)
 
 		#If change, removes days that were not in the new day set
 		previous_day_set = self.days.all()
@@ -198,9 +238,9 @@ class Event(models.Model):
 		if self.repeat and not self.duration:
 			raise ValidationError({'duration': msg})
 
-		#If the event lasts more than 2 days and the user tries to repeat daily
-		if self.repeat and self.duration == '1' and self.end_date.day - self.start_date.day >= 1:
-			raise ValidationError({'duration': 'If repeating daily, the event may only last one day'})
+		#If the event lasts more than 2 days and the user tries to repeat
+		if self.repeat and self.end_date.day - self.start_date.day >= 1:
+			raise ValidationError({'repeat': 'If repeating, event may only last one day.'})
 
 		if self.repeat and not self.ends_on and not self.ends_after:
 			raise ValidationError({'ends_on': 'Fill in either this field or the "Ends After" field'})

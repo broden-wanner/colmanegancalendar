@@ -69,7 +69,8 @@ def newEventView(request):
 	if request.method == 'POST':
 		new_event_form = EventForm(request.POST)
 		if new_event_form.is_valid():
-			new_event = new_event_form.save(commit=True)
+			new_event = new_event_form.save()
+			new_event.set_days_of_event()
 			return redirect('month', year=new_event.start_date.year, month=new_event.start_date.month)
 	else:
 		new_event_form = EventForm(initial={
@@ -94,7 +95,8 @@ def editEventView(request, year, month, day, pk, slug):
 	if request.method == 'POST':
 		event_form = EventForm(request.POST, instance=event)
 		if event_form.is_valid():
-			event = event_form.save(commit=True)
+			event = event_form.save()
+			event.set_days_of_event()
 			return redirect('month', year=event.start_date.year, month=event.start_date.month)
 	else:
 		event_form = EventForm(instance=event)
