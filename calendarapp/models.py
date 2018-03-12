@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.text import slugify
@@ -79,7 +80,7 @@ class Day(models.Model):
 
 class Calendar(models.Model):
 	event_calendar = models.CharField(max_length=100, unique=True)
-	#creator = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+	#creator = models.ForeignKey('Member', on_delete=models.CASCADE)
 	color = models.CharField(max_length=7, unique=True, null=True)
 	slug = models.SlugField(unique=True, blank=True, null=True)
 
@@ -91,9 +92,10 @@ class Calendar(models.Model):
 		self.slug = slugify(self.event_calendar)
 		super(Calendar, self).save(*args, **kwargs)
 
+
 class Location(models.Model):
 	location = models.CharField(max_length=1000, unique=True)
-	#creator = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+	#creator = models.ForeignKey('Member', on_delete=models.CASCADE)
 	slug = models.SlugField(unique=True, blank=True)
 
 	def __str__(self):
@@ -104,6 +106,13 @@ class Location(models.Model):
 		self.slug = slugify(self.location)
 		super(Location, self).save(*args, **kwargs)
 
+class Member(models.Model):
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	calendar_preferences = models.ManyToManyField('Calendar')
+
+	def __str__(self):
+		return self.user.username
+
 class DayOfWeek(models.Model):
 	day_of_week = models.CharField(max_length=20)
 	day_int = models.IntegerField(default=0)
@@ -113,7 +122,7 @@ class DayOfWeek(models.Model):
 
 class Event(models.Model):
 	title = models.CharField(max_length=100)
-	#creator = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+	#creator = models.ForeignKey('Member', on_delete=models.CASCADE)
 	slug = models.SlugField(unique=False, blank=True, null=True)
 	event_info = models.TextField(blank=True)
 	location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True)
@@ -217,7 +226,6 @@ class Event(models.Model):
 		for day in previous_day_set:
 			if day not in list(chain(new_set_of_days, recurring_days)):
 				self.days.remove(day)
-
 
 	def clean(self):
 		#Check to ensure the dates don't come before one another
