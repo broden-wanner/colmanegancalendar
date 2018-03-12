@@ -77,4 +77,4 @@ class CalendarForm(forms.ModelForm):
 
 	class Meta:
 		model = Calendar
-		fields = ('event_calendar', 'color')
+		fields = ('event_calendar', 'color', 'default_calendar')

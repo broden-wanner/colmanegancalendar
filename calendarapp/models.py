@@ -70,9 +70,13 @@ class Day(models.Model):
 	def __str__(self):
 		return '%i of %s %i' % (self.day_of_month, self.month.month_str, int(self.month.year.year))
 
-	def sorted_events(self):
+	def sorted_events(self, calendar_preferences=None):
+		if not calendar_preferences:
+			calendars = Calendar.objects.filter(default_calendar=True)
+		elif calendar_preferences:
+			calendars = calendar_preferences
 		#Sort events with all day ones coming first (ordered by title) then other events (ordered by time)
-		return list(chain(self.event_set.filter(all_day=True).order_by('title'), self.event_set.exclude(all_day=True).order_by('start_time')))
+		return list(chain(self.event_set.filter(all_day=True, calendar__in=calendars).order_by('title'), self.event_set.exclude(all_day=True).filter(calendar__in=calendars).order_by('start_time')))
 
 	def save(self, *args, **kwargs):
 		self.day_of_week_str = day_dictionary[self.day_of_week]
@@ -80,6 +84,7 @@ class Day(models.Model):
 
 class Calendar(models.Model):
 	event_calendar = models.CharField(max_length=100, unique=True)
+	default_calendar = models.BooleanField(default=False)
 	#creator = models.ForeignKey('Member', on_delete=models.CASCADE)
 	color = models.CharField(max_length=7, unique=True, null=True)
 	slug = models.SlugField(unique=True, blank=True, null=True)
@@ -91,7 +96,6 @@ class Calendar(models.Model):
 		self.event_calendar = self.event_calendar.title()
 		self.slug = slugify(self.event_calendar)
 		super(Calendar, self).save(*args, **kwargs)
-
 
 class Location(models.Model):
 	location = models.CharField(max_length=1000, unique=True)
@@ -108,13 +112,14 @@ class Location(models.Model):
 
 class Member(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	calendar_preferences = models.ManyToManyField('Calendar')
+	calendar_preferences = models.ManyToManyField('Calendar', blank=True)
 
 	def __str__(self):
 		return self.user.username
 
 class DayOfWeek(models.Model):
 	day_of_week = models.CharField(max_length=20)
+	#Zero-indexed 0-6
 	day_int = models.IntegerField(default=0)
 
 	def __str__(self):

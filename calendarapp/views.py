@@ -100,7 +100,7 @@ def newEventView(request):
 			'end_time': (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%H:%M'),
 			'repeat_every': 1,
 			'duration': 2,
-			'repeat_on': get_object_or_404(DayOfWeek, day_int=datetime.datetime.now().weekday()),
+			'repeat_on': get_object_or_404(DayOfWeek, day_int=timezone.now().weekday() + 1 if timezone.now().weekday() < 7 else 0),
 			'ends_on': (datetime.datetime.now() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'),
 		})
 
