@@ -1,9 +1,30 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from django.http import JsonResponse
+import json
 from django.utils import timezone
 import datetime
 import time
 from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
 from .forms import EventForm, CalendarForm
+
+def return_calendars(request, option):
+	#Determines calendars to hide
+	if request.user.is_authenticated:
+		shown_calendars = request.user.member.calendar_preferences.all()
+		shown_calendar_pks = [calendar.pk for calendar in shown_calendars]
+		hidden_calendars = Calendar.objects.exclude(pk__in=shown_calendar_pks)
+		#If user has no preferences, display default calendars
+		if not shown_calendars:
+			hidden_calendars = Calendar.objects.exclude(default_calendar=True)
+			shown_calendars = Calendar.objects.filter(default_calendar=True)
+	else:
+		hidden_calendars = Calendar.objects.exclude(default_calendar=True)
+		shown_calendars = Calendar.objects.filter(default_calendar=True)
+
+	if option == 'shown_calendars':
+		return shown_calendars
+	elif option == 'hidden_calendars':
+		return hidden_calendars
 
 def calendarHomeView(request):
 	return redirect('month', year=timezone.now().year, month=timezone.now().month)
@@ -62,7 +83,9 @@ def calendarMonthView(request, year, month):
 		'next_month': next_month,
 		'previous_month': previous_month,
 		'calendars': Calendar.objects.all().order_by('event_calendar'),
-		'locations': Location.objects.all().order_by('location')
+		'locations': Location.objects.all().order_by('location'),
+		'shown_calendars': return_calendars(request, 'shown_calendars'),
+		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
 	})
 
 def calendarWeekView(request, year, month, first_day_of_week):
@@ -76,14 +99,26 @@ def calendarWeekView(request, year, month, first_day_of_week):
 	return render(request, 'week.html', {
 		'week': week,
 		'first_day_of_next_week': first_day_of_next_week,
-		'first_day_of_last_week': first_day_of_last_week
+		'first_day_of_last_week': first_day_of_last_week, 
+		'calendars': Calendar.objects.all().order_by('event_calendar'),
+		'shown_calendars': return_calendars(request, 'shown_calendars'),
+		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
 	})
 
 def calendarDayView(request, year, month, day):
 	this_year = get_object_or_404(Year, year=year)
 	this_month = get_object_or_404(Month, year=this_year, month=month)
 	this_day = get_object_or_404(Day, month=this_month, day_of_month=day)
-	return render(request, 'day.html', {'day': this_day})
+	next_day = get_object_or_404(Day, pk=this_day.pk+1)
+	previous_day = get_object_or_404(Day, pk=this_day.pk-1)
+	return render(request, 'day.html', {
+		'day': this_day,
+		'next_day': next_day,
+		'previous_day': previous_day,
+		'calendars': Calendar.objects.all().order_by('event_calendar'),
+		'shown_calendars': return_calendars(request, 'shown_calendars'),
+		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
+	})
 
 def newEventView(request):
 	if request.method == 'POST':
@@ -93,15 +128,18 @@ def newEventView(request):
 			new_event.set_days_of_event()
 			return redirect('month', year=new_event.start_date.year, month=new_event.start_date.month)
 	else:
+		start_time = timezone.localtime()
+		start_time = start_time - datetime.timedelta(seconds=start_time.minute*60)
+		end_time = start_time + datetime.timedelta(hours=1)
 		new_event_form = EventForm(initial={
-			'start_date': timezone.now().strftime('%Y-%m-%d'),
-			'end_date': timezone.now().strftime('%Y-%m-%d'),
-			'start_time': datetime.datetime.now().strftime('%H:%M'),
-			'end_time': (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%H:%M'),
+			'start_date': start_time,
+			'end_date': end_time,
+			'start_time': start_time,
+			'end_time': end_time,
 			'repeat_every': 1,
 			'duration': 2,
-			'repeat_on': get_object_or_404(DayOfWeek, day_int=timezone.now().weekday() + 1 if timezone.now().weekday() < 7 else 0),
-			'ends_on': (datetime.datetime.now() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'),
+			'repeat_on': get_object_or_404(DayOfWeek, day_int=timezone.localtime().weekday() + 1 if timezone.localtime().weekday() < 7 else 0),
+			'ends_on': (timezone.localtime() + datetime.timedelta(days=30)),
 		})
 
 	return render(request, 'new_event.html', {'new_event_form': new_event_form})
@@ -169,3 +207,18 @@ def locationView(request, slug):
 	location = get_object_or_404(Location, slug=slug)
 	events = Event.objects.filter(location=location).order_by('start_date', 'start_time')
 	return render(request, 'location_view.html', {'location': location, 'events': events})
+
+def filter_calendars(request):
+	data = {}
+	if request.is_ajax():
+		request_get_dict = dict(request.GET.lists())
+		calendar_pks = request_get_dict.get('calendar_pks[]', None)
+		hidden_calendars_pks = None
+		if calendar_pks:
+			calendar_pks = [int(pk) for pk in calendar_pks]
+			hidden_calendars = Calendar.objects.exclude(pk__in=calendar_pks)
+			hidden_calendars_pks = [calendar.pk for calendar in hidden_calendars]
+		data = {
+			'hidden_calendars_pks': hidden_calendars_pks,
+		}
+	return JsonResponse(data)

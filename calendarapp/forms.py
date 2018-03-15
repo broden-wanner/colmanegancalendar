@@ -4,20 +4,20 @@ from .models import Event, Calendar, DayOfWeek
 
 class EventForm(forms.ModelForm):
 	start_date = forms.DateField(
-		input_formats=['%Y-%m-%d'],
-		widget=forms.DateInput(attrs={'type': 'date'})
+		input_formats=['%m/%d/%Y'],
+		widget=forms.DateInput(format='%m/%d/%Y')
 	)
 	start_time = forms.TimeField(
-		input_formats=['%H:%M'],
-		widget=forms.TimeInput(attrs={'type': 'time'}, format='%H:%M')
+		input_formats=['%I:%M %p'],
+		widget=forms.TimeInput(format='%I:%M %p')
 	)
 	end_date = forms.DateField(
-		input_formats=['%Y-%m-%d'],
-		widget=forms.DateInput(attrs={'type': 'date'})
+		input_formats=['%m/%d/%Y'],
+		widget=forms.DateInput(format='%m/%d/%Y')
 	)
 	end_time = forms.TimeField(
-		input_formats=['%H:%M'],
-		widget=forms.TimeInput(attrs={'type': 'time'}, format='%H:%M')
+		input_formats=['%I:%M %p'],
+		widget=forms.TimeInput(format='%I:%M %p')
 	)
 	#Handles data for the recurring aspect of the event
 	repeat = forms.BooleanField(required=False)

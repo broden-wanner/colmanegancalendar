@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% load humanize %}
-{% load calendar_tags %}
 
 {% block content %}
 
@@ -12,12 +11,17 @@
 		<p>None</p>
 	{% else %}
 		<ul>
-			{% get_default_calendar_events user day as events %}
-			{% for event in events %}
-				<li data-calendar="{{ event.calendar.event_calendar }}"><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">{{ event.start_date|date:'n/j/y' }} {{ event.start_time|date:'f a' }} {{ event.title }}</a></li>
+			{% for event in day.sorted_events %}
+				<li data-calendar-pk="{{ event.calendar.pk }}"><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">{{ event.start_date|date:'n/j/y' }} {{ event.start_time|date:'f a' }} {{ event.title }}</a></li>
 			{% endfor %}
 		</ul>
 	{% endif %}
+
+	{% include 'calendar_filter.html' %}
+
+	<p><a href="{% url 'day' year=next_day.month.year.year month=next_day.month.month day=next_day.day_of_month %}">Next Day</a></p>
+	<p><a href="{% url 'day' year=previous_day.month.year.year month=previous_day.month.month day=previous_day.day_of_month %}">Previous Day</a></p>
+
 </div>
 
 {% endblock %}

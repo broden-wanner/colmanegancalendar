@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% load humanize %}
-{% load calendar_tags %}
 
 {% block content %}
 
@@ -16,13 +15,12 @@
 		<tr>
 			{% for day in week %}
 				<td>
-					{% get_default_calendar_events user day as events %}
-					{% if not events %}
+					{% if not day.sorted_events %}
 						<p>No events scheduled</p>
 					{% else %}
 					<ul>
-						{% for event in events %}
-							<li data-calendar="{{ event.calendar.event_calendar }}">
+						{% for event in day.sorted_events %}
+							<li data-calendar-pk="{{ event.calendar.pk }}">
 								<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}">
 								{% if not event.all_day%}
 									{{ event.start_time|time:'f A' }}
@@ -36,6 +34,8 @@
 			{% endfor %}
 		</tr>
 	</table>
+
+	{% include 'calendar_filter.html' %}
 
 	<p><a href="{% url 'week' year=first_day_of_next_week.month.year.year month=first_day_of_next_week.month.month first_day_of_week=first_day_of_next_week.day_of_month %}">Next Week</a></p>
 	<p><a href="{% url 'week' year=first_day_of_last_week.month.year.year month=first_day_of_last_week.month.month first_day_of_week=first_day_of_last_week.day_of_month %}">Last Week</a></p>

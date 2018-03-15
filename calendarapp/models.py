@@ -70,13 +70,9 @@ class Day(models.Model):
 	def __str__(self):
 		return '%i of %s %i' % (self.day_of_month, self.month.month_str, int(self.month.year.year))
 
-	def sorted_events(self, calendar_preferences=None):
-		if not calendar_preferences:
-			calendars = Calendar.objects.filter(default_calendar=True)
-		elif calendar_preferences:
-			calendars = calendar_preferences
-		#Sort events with all day ones coming first (ordered by title) then other events (ordered by time)
-		return list(chain(self.event_set.filter(all_day=True, calendar__in=calendars).order_by('title'), self.event_set.exclude(all_day=True).filter(calendar__in=calendars).order_by('start_time')))
+	def sorted_events(self):
+		#Puts all-day events before timed events
+		return list(chain(self.event_set.filter(all_day=True).order_by('title'), self.event_set.exclude(all_day=True).order_by('start_time')))
 
 	def save(self, *args, **kwargs):
 		self.day_of_week_str = day_dictionary[self.day_of_week]
@@ -234,14 +230,11 @@ class Event(models.Model):
 
 	def clean(self):
 		#Check to ensure the dates don't come before one another
-		if self.start_date > self.end_date:
+		if datetime.datetime.combine(self.start_date, self.start_time) >= datetime.datetime.combine(self.end_date, self.end_time):
 			raise ValidationError({
 				'start_date': 'Start date must be less than or equal to end date.',
-				'end_date': 'End date must be greater than or equal to start date.'
-			})
-		if self.start_time >= self.end_time:
-			raise ValidationError({
-				'start_time':'Start time must be less than end time.',
+				'start_time': 'Start time must be less than end time.',
+				'end_date': 'End date must be greater than or equal to start date.',
 				'end_time': 'End time must be greater than start time.'
 			})
 

@@ -1,5 +1,20 @@
 var showHideDuration = 200;
 
+//Adds date and time pickers to forms
+$(function() {
+	$('input[name="start_date"]').datepicker();
+	$('input[name="end_date"]').datepicker();
+	$('input[name="start_time"]').timepicker({
+		timeFormat: 'hh:mm p',
+		interval: 15
+	});
+	$('input[name="end_time"]').timepicker({
+		timeFormat: 'hh:mm p',
+		interval: 15
+	});
+});
+
+
 //Handles the showing and hiding of the time boxes depending on all_day
 var $allDayBox = $('input[name="all_day"]');
 var $startTimeInput = $('input[name="start_time"]').parent();

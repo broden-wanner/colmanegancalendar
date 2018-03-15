@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% load humanize %}
-{% load calendar_tags %}
 
 {% block content %}
 
@@ -18,9 +17,8 @@
 						<td><a href="{% url 'day' year=day.month.year.year month=day.month.month day=day.day_of_month %}">{{ day.day_of_month|ordinal }} of {{ day.month.month_str }}</a>
 							<br>
 							<ul>
-								{% get_default_calendar_events user day as events %}
-								{% for event in events %}
-									<li data-calendar="{{ event.calendar.event_calendar }}">
+								{% for event in day.sorted_events %}
+									<li data-calendar-pk="{{ event.calendar.pk }}">
 										<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}">
 										{% if not event.all_day%}
 											{{ event.start_time|time:'f A' }}
@@ -37,6 +35,8 @@
 	</table>
 	<p><a href="{% url 'month' year=next_month.year.year month=next_month.month %}">Next Month: {{ next_month.month_str }} {{ next_month.year.year }}</a></p>
 	<p><a href="{% url 'month' year=previous_month.year.year month=previous_month.month %}">Previous Month: {{ previous_month.month_str }} {{ previous_month.year.year }}</a></p>
+
+	{% include 'calendar_filter.html' %}
 
 	<h2>Calendars</h2>
 	<ul>

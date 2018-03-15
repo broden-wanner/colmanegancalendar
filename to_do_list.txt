@@ -1,9 +1,7 @@
-3. Add better date-picker abilites
-5. Allow filtering of calendars in urls
-	- Have tab on left to choose calendar
-	- Use Ajax
-	- Use custom html attributes to get the calendars
-	- Add preferences on calendars to show to send into the views
 7. Add user accounts
-8. Add email
+	- admin and regular accounts
+8. Add email functionality
 9. Finally, style!
+9. have ability to change between month, week, and day views without reloading
+10. maybe delete and edit events without reloading page
+11. Use session data to keep calendar filter choices

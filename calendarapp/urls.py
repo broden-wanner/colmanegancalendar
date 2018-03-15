@@ -15,4 +15,5 @@ urlpatterns = [
 	path('calendar/<slug:slug>/edit', views.editCalendarView, name='edit_calendar'),
 	path('calendar/<slug:slug>/delete', views.deleteCalendarView, name='delete_calendar'),
 	path('location/<slug:slug>/', views.locationView, name='location_view'),
+	path('ajax/filter-calendar', views.filter_calendars, name='filter_calendars')
 ]
