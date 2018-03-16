@@ -1,5 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.text import slugify
@@ -81,8 +83,7 @@ class Day(models.Model):
 class Calendar(models.Model):
 	event_calendar = models.CharField(max_length=100, unique=True)
 	default_calendar = models.BooleanField(default=False)
-	#creator = models.ForeignKey('Member', on_delete=models.CASCADE)
-	color = models.CharField(max_length=7, unique=True, null=True)
+	color = models.CharField(max_length=50, unique=True, null=True)
 	slug = models.SlugField(unique=True, blank=True, null=True)
 
 	def __str__(self):
@@ -95,7 +96,6 @@ class Calendar(models.Model):
 
 class Location(models.Model):
 	location = models.CharField(max_length=1000, unique=True)
-	#creator = models.ForeignKey('Member', on_delete=models.CASCADE)
 	slug = models.SlugField(unique=True, blank=True)
 
 	def __str__(self):
@@ -113,6 +113,16 @@ class Member(models.Model):
 	def __str__(self):
 		return self.user.username
 
+@receiver(post_save, sender=User)
+def update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Member.objects.create(user=instance)
+        try:
+        	instance.groups.add(Group.objects.get(name='Members'))
+        except Group.DoesNotExist:
+        	pass
+    instance.member.save()
+
 class DayOfWeek(models.Model):
 	day_of_week = models.CharField(max_length=20)
 	#Zero-indexed 0-6
@@ -123,10 +133,10 @@ class DayOfWeek(models.Model):
 
 class Event(models.Model):
 	title = models.CharField(max_length=100)
-	#creator = models.ForeignKey('Member', on_delete=models.CASCADE)
+	creator = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
 	slug = models.SlugField(unique=False, blank=True, null=True)
 	event_info = models.TextField(blank=True)
-	location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True)
+	location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, blank=True)
 	days = models.ManyToManyField('Day')
 	start_date = models.DateField()
 	start_time = models.TimeField()

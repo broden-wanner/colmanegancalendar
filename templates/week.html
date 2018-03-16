@@ -21,7 +21,7 @@
 					<ul>
 						{% for event in day.sorted_events %}
 							<li data-calendar-pk="{{ event.calendar.pk }}">
-								<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}">
+								<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}" style="color: {{ event.calendar.color }};">
 								{% if not event.all_day%}
 									{{ event.start_time|time:'f A' }}
 								{% endif %}

@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django.forms import ValidationError
 from .models import Event, Calendar, DayOfWeek
 
@@ -37,7 +39,8 @@ class EventForm(forms.ModelForm):
 	)
 	ends_after = forms.IntegerField(
 		widget=forms.NumberInput(attrs={'type': 'number', 'min': 1}),
-		required=False
+		required=False,
+		help_text='occurences'
 	)
 	
 	class Meta:
@@ -71,10 +74,29 @@ class EventForm(forms.ModelForm):
 			self.add_error('repeat_on', 'If repeating weekly, this field must be filled')
 
 class CalendarForm(forms.ModelForm):
-	color = forms.CharField(
-		widget=forms.TextInput(attrs={'type': 'color'})
-	)
 
 	class Meta:
 		model = Calendar
 		fields = ('event_calendar', 'color', 'default_calendar')
+
+class MemberCreationForm(UserCreationForm):
+	first_name = forms.CharField(max_length=30)
+	last_name = forms.CharField(max_length=30)
+	email = forms.EmailField(max_length=254, help_text='Required. Input a valid email address.')
+	calendar_preferences = forms.ModelMultipleChoiceField(
+		queryset=Calendar.objects.all(),
+		widget=forms.CheckboxSelectMultiple(),
+		required=False
+	)
+
+	class Meta:
+		model = User
+		fields = (
+			'username',
+			'first_name',
+			'last_name',
+			'email',
+			'password1',
+			'password2',
+			'calendar_preferences'
+		)

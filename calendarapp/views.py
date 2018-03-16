@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from django.contrib.auth import login, authenticate
 from django.http import JsonResponse
 import json
 from django.utils import timezone
 import datetime
 import time
 from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
-from .forms import EventForm, CalendarForm
+from .forms import EventForm, CalendarForm, MemberCreationForm
 
 def return_calendars(request, option):
 	#Determines calendars to hide
@@ -77,6 +78,14 @@ def calendarMonthView(request, year, month):
 					next_day_index += 1
 		calendar_rows.append(week_row)
 
+	if timezone.localtime().month == current_month.month:
+		first_day_of_week = timezone.localtime()
+		while first_day_of_week.weekday() != 6:
+			first_day_of_week -= datetime.timedelta(days=1)
+		first_day_of_week = get_object_or_404(Day, month=Month.objects.get(year=Year.objects.get(year=first_day_of_week.year), month=first_day_of_week.month), day_of_month=first_day_of_week.day)
+	else:
+		first_day_of_week = calendar_rows[0][0]
+
 	return render(request, 'month.html', {
 		'month_weeks': calendar_rows,
 		'current_month': current_month,
@@ -84,6 +93,7 @@ def calendarMonthView(request, year, month):
 		'previous_month': previous_month,
 		'calendars': Calendar.objects.all().order_by('event_calendar'),
 		'locations': Location.objects.all().order_by('location'),
+		'first_day_of_week': first_day_of_week,
 		'shown_calendars': return_calendars(request, 'shown_calendars'),
 		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
 	})
@@ -124,7 +134,9 @@ def newEventView(request):
 	if request.method == 'POST':
 		new_event_form = EventForm(request.POST)
 		if new_event_form.is_valid():
-			new_event = new_event_form.save()
+			new_event = new_event_form.save(commit=False)
+			new_event.creator = request.user
+			new_event.save()
 			new_event.set_days_of_event()
 			return redirect('month', year=new_event.start_date.year, month=new_event.start_date.month)
 	else:
@@ -172,7 +184,9 @@ def newCalendarView(request):
 	if request.method == 'POST':
 		new_calendar_form = CalendarForm(request.POST)
 		if new_calendar_form.is_valid():
-			new_calendar_form.save()
+			new_calendar = new_calendar_form.save(commit=False)
+			new_calendar.creator = request.user
+			new_calendar.save()
 			return redirect('month', year=timezone.now().year, month=timezone.now().month)
 	else:
 		new_calendar_form = CalendarForm()
@@ -208,17 +222,19 @@ def locationView(request, slug):
 	events = Event.objects.filter(location=location).order_by('start_date', 'start_time')
 	return render(request, 'location_view.html', {'location': location, 'events': events})
 
-def filter_calendars(request):
-	data = {}
-	if request.is_ajax():
-		request_get_dict = dict(request.GET.lists())
-		calendar_pks = request_get_dict.get('calendar_pks[]', None)
-		hidden_calendars_pks = None
-		if calendar_pks:
-			calendar_pks = [int(pk) for pk in calendar_pks]
-			hidden_calendars = Calendar.objects.exclude(pk__in=calendar_pks)
-			hidden_calendars_pks = [calendar.pk for calendar in hidden_calendars]
-		data = {
-			'hidden_calendars_pks': hidden_calendars_pks,
-		}
-	return JsonResponse(data)
+def signup(request):
+	if request.method == 'POST':
+		form = MemberCreationForm(request.POST)
+		if form.is_valid():
+			user = form.save()
+			user.refresh_from_db()
+			user.member.calendar_preferences.set(form.cleaned_data.get('calendar_preferences'))
+			user.save()
+			username = form.cleaned_data.get('username')
+			raw_password = form.cleaned_data.get('password1')
+			user = authenticate(username=username, password=raw_password)
+			login(request, user)
+			return redirect('home')
+	else:
+		form = MemberCreationForm()
+	return render(request, 'registration/signup.html', {'form': form})

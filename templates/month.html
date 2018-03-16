@@ -1,14 +1,11 @@
 {% extends 'base.html' %}
-
 {% load humanize %}
 
 {% block content %}
 
 <div class="container">
 	<h1>{{ current_month.month_str }} {{ current_month.year.year }}</h1>
-	<p><a href="{% url 'new_event' %}">+ New Event</a></p>
-	<p><a href="{% url 'new_calendar' %}">+ New Calendar</a></p>
-	<p><a href="{% url 'week' year=month_weeks.0.0.month.year.year month=month_weeks.0.0.month.month first_day_of_week=month_weeks.0.0.day_of_month %}">Week View</a></p>
+	<p><a href="{% url 'week' year=first_day_of_week.month.year.year month=first_day_of_week.month.month first_day_of_week=first_day_of_week.day_of_month %}">Week View</a></p>
 	<table class="table table-bordered">
 		<tbody>
 			{% for week in month_weeks %}
@@ -19,7 +16,7 @@
 							<ul>
 								{% for event in day.sorted_events %}
 									<li data-calendar-pk="{{ event.calendar.pk }}">
-										<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}">
+										<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}" style="color: {{ event.calendar.color }};">
 										{% if not event.all_day%}
 											{{ event.start_time|time:'f A' }}
 										{% endif %}
@@ -41,7 +38,7 @@
 	<h2>Calendars</h2>
 	<ul>
 	{% for calendar in calendars %}
-		<li><a href="{% url 'calendar_view' slug=calendar.slug %}">{{ calendar.event_calendar }}</a></li>
+		<li><a href="{% url 'calendar_view' slug=calendar.slug %}" style="color: {{ calendar.color }};">{{ calendar.event_calendar }}</a></li>
 	{% endfor %}
 	</ul>
 

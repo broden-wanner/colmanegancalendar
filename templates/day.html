@@ -12,7 +12,7 @@
 	{% else %}
 		<ul>
 			{% for event in day.sorted_events %}
-				<li data-calendar-pk="{{ event.calendar.pk }}"><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">{{ event.start_date|date:'n/j/y' }} {{ event.start_time|date:'f a' }} {{ event.title }}</a></li>
+				<li data-calendar-pk="{{ event.calendar.pk }}"><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}" style="color: {{ event.calendar.color }};"> {% if not event.all_day%}{{ event.start_time|time:'f A' }}{% endif %} {{ event.title }}{% if event.all_day %} (All-Day){% endif %}</a></li>
 			{% endfor %}
 		</ul>
 	{% endif %}

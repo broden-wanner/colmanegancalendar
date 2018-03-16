@@ -2,13 +2,8 @@ var showHideDuration = 200;
 
 //Adds date and time pickers to forms
 $(function() {
-	$('input[name="start_date"]').datepicker();
-	$('input[name="end_date"]').datepicker();
-	$('input[name="start_time"]').timepicker({
-		timeFormat: 'hh:mm p',
-		interval: 15
-	});
-	$('input[name="end_time"]').timepicker({
+	$('input[name="start_date"], input[name="end_date"]').datepicker();
+	$('input[name="start_time"], input[name="end_time"]').timepicker({
 		timeFormat: 'hh:mm p',
 		interval: 15
 	});
@@ -34,11 +29,6 @@ $allDayBox.click(function() {
 		$endTimeInput.show(showHideDuration);
 	}
 });
-
-
-
-//Append 'occurences' to ends_after input box
-$('input[name="ends_after"]').parent().append(" occurences");
 
 
 

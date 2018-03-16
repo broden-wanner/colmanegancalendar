@@ -7,7 +7,7 @@
 	<p>Events happening in this location:</p>
 	<ul>
 		{% for event in events %}
-			<li><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">{{ event.start_date|date:'n/j/y' }} {{ event.start_time|date:'f a' }} {{ event.title }}</a></li>
+			<li><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}" style="color: {{ event.calendar.color }};">{{ event.start_date|date:'n/j/y' }} {{ event.start_time|date:'f a' }} {{ event.title }}</a></li>
 		{% endfor %}
 	</ul>
 </div>

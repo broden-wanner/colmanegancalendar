@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
 {% block content %}
 
 <div class="container">
@@ -10,5 +12,7 @@
 		<button type="submit" value="edit_calendar">Save Calendar</button>
 	</form>
 </div>
+
+<script type="text/javascript" src="{% static 'js/calendarform.js' %}"></script>
 
 {% endblock %}

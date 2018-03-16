@@ -2,7 +2,7 @@
 <ul id="filter-calendars-list">
 	{% for calendar in calendars %}
 		<li>
-			<label for="filter-calendar-{{ calendar.pk }}">
+			<label for="filter-calendar-{{ calendar.pk }}" style="color: {{ calendar.color }};">
 				<input type="checkbox" name="filter-calendar" value="{{ calendar.pk }}" id="filter-calendar-{{ calendar.pk }}">    {{ calendar.event_calendar }}
 			</label>
 		</li>
@@ -20,44 +20,33 @@
 		$('li[data-calendar-pk="{{ calendar.pk }}"]').hide();
 	{% endfor %}
 
-	//Hides and shows calendars depending on what boxes are checked
+	//Show and hide events based on checkboxes
 	$('input[name="filter-calendar"]').change(function () {
 		var calendars_to_show = [];
 		$('input[name="filter-calendar"]:checked').each(function() {
 			calendars_to_show.push(parseInt($(this).val()));
 		});
-		//console.log(calendars_to_show);
-		$.ajax({
-			url: "{% url 'filter_calendars' %}",
-			data: {
-				calendar_pks: calendars_to_show
-			},
-			dataType: 'json',
-			success: function (data) {
-				//console.log(data.hidden_calendars_pks);
-				//A collection of the primary keys of the calendars to hide
-				var calendars_to_hide = data.hidden_calendars_pks;
-				//Hide all events associated with a calendar to hide
-				//console.log("calendars_to_hide: " + calendars_to_hide);
-				if(calendars_to_hide) {
-					for(var i = 0; i < calendars_to_hide.length; i++) {
-						$('li[data-calendar-pk="' + calendars_to_hide[i] + '"]').hide();
-					}
-				} else {
-					//Show all calendars if there are none to hide
-					$('li[data-calendar-pk]').show();
-				}
-				//Show all events associated with chosen calendar
-				//console.log("calendars_to_show: " + calendars_to_show);
-				if(calendars_to_show.length) {
-					for(var i = 0; i < calendars_to_show.length; i++) {
-						$('li[data-calendar-pk="' + calendars_to_show[i] + '"]').show();
-					}
-				} else {
-					//Hide all calendars if there are none to show
-					$('li[data-calendar-pk]').hide();
-				}
+		//Show all events associated with chosen calendar
+		if(calendars_to_show.length) {
+			for(var i = 0; i < calendars_to_show.length; i++) {
+				$('li[data-calendar-pk="' + calendars_to_show[i] + '"]').show();
 			}
+		} else {
+			//Hide all calendars if there are none to show
+			$('li[data-calendar-pk]').hide();
+		}
+
+		var calendars_to_hide = [];
+		$('input[name="filter-calendar"]:not(:checked)').each(function() {
+			calendars_to_hide.push(parseInt($(this).val()));
 		});
+		if(calendars_to_hide.length) {
+			for(var i = 0; i < calendars_to_hide.length; i++) {
+				$('li[data-calendar-pk="' + calendars_to_hide[i] + '"]').hide();
+			}
+		} else {
+			//Show all calendars if there are none to hide
+			$('li[data-calendar-pk]').show();
+		}
 	});
 </script>

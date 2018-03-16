@@ -5,7 +5,7 @@
 		<h1>{{ event.title }}</h1>
 		<p>Calendar: {{ event.calendar.event_calendar }}</p>
 		<p>Event Info: {% if event.event_info %}{{ event.event_info }}{% else %}None{% endif %}</p>
-		<p>Location: {{ event.location.location }}</p>
+		<p>Location: {% if event.location %}{{ event.location.location }}{% else %}None{% endif %}</p>
 		<p>Starts: {{ event.start_date }}{% if not event.all_day %}, {{ event.start_time }}{% endif %}</p>
 		<p>Ends: {{ event.end_date }}{% if not event.all_day %}, {{ event.end_time }}{% endif %}</p>
 		<p>All day: {{ event.all_day|yesno:'Yes, No' }}</p>
@@ -19,7 +19,13 @@
 			{% endif %}
 		{% endif %}
 		<p>Date Created: {{ event.date_created }}</p>
-		<p><a href="{% url 'edit_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Edit Event</a></p>
-		<p><a href="{% url 'delete_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Delete Event</a></p>
+		<p>Created by {{ event.creator.username }}</p>
+
+		{% if perms.calendarapp.change_event %}
+			<p><a href="{% url 'edit_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Edit Event</a></p>
+		{% endif %}
+		{% if perms.calendarapp.delete_event %}
+			<p><a href="{% url 'delete_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Delete Event</a></p>
+		{% endif %}
 	</div>
 {% endblock %}
