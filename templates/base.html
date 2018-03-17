@@ -10,11 +10,11 @@
 	<link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+	<link rel="stylesheet" href="{% static 'css/spectrum.css' %}">
 	<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="{% static 'js/spectrum.js' %}"></script>
-	<link rel="stylesheet" href="{% static 'css/spectrum.css' %}">
+	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="{% static 'js/spectrum.js' %}"></script>
 </head>
 <body>
 {% pagination_links request.path as pagination_links %}
@@ -30,6 +30,7 @@
 		  	<a class="navbar-brand" href="{% url 'home' %}">Colman-Egan Calendar</a>
 		</div>
 		<div class="collapse navbar-collapse" id="calendar-navbar">
+			{# Dislpays the pagination arrows for the calendar #}
 			<ul class="nav navbar-nav">
 				{% if pagination_links %}
 					{% if 'month' in request.path %}
@@ -54,15 +55,16 @@
 							</div>
 						</li>
 					{% endif %}
+					{# Displays the current month and year on the view #}
 				    <li><p class="navbar-text">{{ current_month.month_str }} {{ current_month.year.year }}</p></li>
 			    {% endif %}
 		  	</ul>
 		  	<ul class="nav navbar-nav navbar-right">
+		  		{# Displays the 'new' links when appropriate #}
 		  		{% if new_event_or_calendar_links %}
 				    {% if perms.calendarapp.add_event or perms.calendarapp.add_calendar %}
 					    <li class="dropdown">
-					        <a class="dropdown-toggle" data-toggle="dropdown">New
-					        <span class="caret"></span></a>
+					        <a class="dropdown-toggle" data-toggle="dropdown">New <span class="caret"></span></a>
 					        <ul class="dropdown-menu">
 					        	{% if perms.calendarapp.add_event %}
 						        	<li><a href="{% url 'new_event' %}">Event</a></li>
@@ -74,6 +76,18 @@
 					     </li>
 					{% endif %}
 				{% endif %}
+				{# Displays the current type of view and a dropdown to change view #}
+				{% if pagination_links %}
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown">{{ type_of_view }} <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="{% url 'month' year=current_month.year.year month=current_month.month %}">Month</a></li>
+							<li><a href="{% url 'week' year=first_day_of_week.month.year.year month=first_day_of_week.month.month first_day_of_week=first_day_of_week.day_of_month %}">Week</a></li>
+							<li><a href="{% url 'day' year=day_view_day.month.year.year month=day_view_day.month.month day=day_view_day.day_of_month %}">Day</a></li>
+						</ul>
+					</li>
+				{% endif %}
+				{# Displays the login/signup/logout links when appropriate #}
 		  		{% if request.path != '/accounts/login/' or request.path != '/accounts/signup/' %}
 					{% if user.is_authenticated %}
 						<li><p class="navbar-text"><span class="glyphicon glyphicon-user"></span> Hi, {{ user.username }}!</p></li>

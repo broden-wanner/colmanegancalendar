@@ -37,8 +37,6 @@
 
 	{% include 'calendar_filter.html' %}
 
-	<p><a href="{% url 'week' year=first_day_of_next_week.month.year.year month=first_day_of_next_week.month.month first_day_of_week=first_day_of_next_week.day_of_month %}">Next Week</a></p>
-	<p><a href="{% url 'week' year=first_day_of_last_week.month.year.year month=first_day_of_last_week.month.month first_day_of_week=first_day_of_last_week.day_of_month %}">Last Week</a></p>
 </div>
 
 {% endblock %}

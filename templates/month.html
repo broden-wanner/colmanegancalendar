@@ -4,7 +4,6 @@
 {% block content %}
 
 <div class="container">
-	<p><a href="{% url 'week' year=first_day_of_week.month.year.year month=first_day_of_week.month.month first_day_of_week=first_day_of_week.day_of_month %}">Week View</a></p>
 	<table class="table table-bordered">
 		<tbody>
 			{% for week in month_weeks %}

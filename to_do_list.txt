@@ -5,3 +5,4 @@
 4. have ability to change between month, week, and day views without reloading
 5. maybe delete and edit events without reloading page
 6. Use session data to keep calendar filter choices
+7. Make it so recurring events acutally create multiple events (use an 'EventGroup' model to associate them)

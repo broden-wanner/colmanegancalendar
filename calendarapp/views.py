@@ -87,6 +87,8 @@ def calendarMonthView(request, year, month):
 		first_day_of_week = calendar_rows[0][0]
 
 	return render(request, 'month.html', {
+		'type_of_view': 'Month',
+		'day_view_day': first_day_of_week,
 		'month_weeks': calendar_rows,
 		'current_month': current_month,
 		'next_month': next_month,
@@ -107,7 +109,10 @@ def calendarWeekView(request, year, month, first_day_of_week):
 	first_day_of_last_week = get_object_or_404(Day, pk=first_day.id-7)
 
 	return render(request, 'week.html', {
+		'type_of_view': 'Week',
 		'week': week,
+		'day_view_day': week[0],
+		'first_day_of_week': week[0],
 		'first_day_of_next_week': first_day_of_next_week,
 		'first_day_of_last_week': first_day_of_last_week,
 		'current_month': this_month,
@@ -122,10 +127,14 @@ def calendarDayView(request, year, month, day):
 	this_day = get_object_or_404(Day, month=this_month, day_of_month=day)
 	next_day = get_object_or_404(Day, pk=this_day.pk+1)
 	previous_day = get_object_or_404(Day, pk=this_day.pk-1)
+	first_day_of_week = get_object_or_404(Day, day_of_week=0, pk__lte=this_day.pk, pk__gte=this_day.pk-6)
 	return render(request, 'day.html', {
+		'type_of_view': 'Day',
 		'day': this_day,
+		'day_view_day': this_day,
 		'next_day': next_day,
 		'previous_day': previous_day,
+		'first_day_of_week': first_day_of_week,
 		'current_month': this_month,
 		'calendars': Calendar.objects.all().order_by('event_calendar'),
 		'shown_calendars': return_calendars(request, 'shown_calendars'),

@@ -19,9 +19,6 @@
 
 	{% include 'calendar_filter.html' %}
 
-	<p><a href="{% url 'day' year=next_day.month.year.year month=next_day.month.month day=next_day.day_of_month %}">Next Day</a></p>
-	<p><a href="{% url 'day' year=previous_day.month.year.year month=previous_day.month.month day=previous_day.day_of_month %}">Previous Day</a></p>
-
 </div>
 
 {% endblock %}
