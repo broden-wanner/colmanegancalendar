@@ -109,7 +109,8 @@ def calendarWeekView(request, year, month, first_day_of_week):
 	return render(request, 'week.html', {
 		'week': week,
 		'first_day_of_next_week': first_day_of_next_week,
-		'first_day_of_last_week': first_day_of_last_week, 
+		'first_day_of_last_week': first_day_of_last_week,
+		'current_month': this_month,
 		'calendars': Calendar.objects.all().order_by('event_calendar'),
 		'shown_calendars': return_calendars(request, 'shown_calendars'),
 		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
@@ -125,6 +126,7 @@ def calendarDayView(request, year, month, day):
 		'day': this_day,
 		'next_day': next_day,
 		'previous_day': previous_day,
+		'current_month': this_month,
 		'calendars': Calendar.objects.all().order_by('event_calendar'),
 		'shown_calendars': return_calendars(request, 'shown_calendars'),
 		'hidden_calendars': return_calendars(request, 'hidden_calendars'),

@@ -4,7 +4,6 @@
 {% block content %}
 
 <div class="container">
-	<h1>{{ current_month.month_str }} {{ current_month.year.year }}</h1>
 	<p><a href="{% url 'week' year=first_day_of_week.month.year.year month=first_day_of_week.month.month first_day_of_week=first_day_of_week.day_of_month %}">Week View</a></p>
 	<table class="table table-bordered">
 		<tbody>
@@ -30,8 +29,6 @@
 			{% endfor %}
 		</tbody>
 	</table>
-	<p><a href="{% url 'month' year=next_month.year.year month=next_month.month %}">Next Month: {{ next_month.month_str }} {{ next_month.year.year }}</a></p>
-	<p><a href="{% url 'month' year=previous_month.year.year month=previous_month.month %}">Previous Month: {{ previous_month.month_str }} {{ previous_month.year.year }}</a></p>
 
 	{% include 'calendar_filter.html' %}
 
