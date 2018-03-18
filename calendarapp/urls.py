@@ -16,4 +16,6 @@ urlpatterns = [
 	path('calendar/<slug:slug>/delete/', views.deleteCalendarView, name='delete_calendar'),
 	path('location/<slug:slug>/', views.locationView, name='location_view'),
 	path('accounts/signup/', views.signup, name='signup'),
+	path('accounts/account-activation-sent/', views.account_activation_sent, name='account_activation_sent'),
+	path('accounts/activate/<str:uidb64>/<str:token>/', views.activate, name='activate'),
 ]

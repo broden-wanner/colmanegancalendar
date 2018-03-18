@@ -82,7 +82,7 @@ class CalendarForm(forms.ModelForm):
 class MemberCreationForm(UserCreationForm):
 	first_name = forms.CharField(max_length=30)
 	last_name = forms.CharField(max_length=30)
-	email = forms.EmailField(max_length=254, help_text='Required. Input a valid email address.')
+	email = forms.EmailField(max_length=254, help_text='Required. Input a valid email address.', required=True)
 	calendar_preferences = forms.ModelMultipleChoiceField(
 		queryset=Calendar.objects.all(),
 		widget=forms.CheckboxSelectMultiple(),

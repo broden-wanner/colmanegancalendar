@@ -1,50 +1,64 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/month_view.css' %}">
+{% endblock %}
 
 {% block content %}
 
-<div class="container">
-	<table class="table table-bordered">
-		<tbody>
-			{% for week in month_weeks %}
+<div class="container-fluid">
+<div class="row">
+
+	<div class="col-sm-10 table-responsive" id="month-table-container">	
+		<table class="table table-bordered" id="month-table">
+			<tbody>
 				<tr>
-					{% for day in week %}
-						<td><a href="{% url 'day' year=day.month.year.year month=day.month.month day=day.day_of_month %}">{{ day.day_of_month|ordinal }} of {{ day.month.month_str }}</a>
-							<br>
-							<ul>
-								{% for event in day.sorted_events %}
-									<li data-calendar-pk="{{ event.calendar.pk }}">
-										<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}" style="color: {{ event.calendar.color }};">
-										{% if not event.all_day%}
-											{{ event.start_time|time:'f A' }}
-										{% endif %}
-										{{ event.title }} {% if event.all_day %}(All-day){% endif %}</a>
-									</li>
-								{% endfor %}
-							</ul>
-						</td>
-					{% endfor %}
+					<td>Sun</td>
+					<td>Mon</td>
+					<td>Tue</td>
+					<td>Wed</td>
+					<td>Thu</td>
+					<td>Fri</td>
+					<td>Sat</td>
 				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+				{% for week in month_weeks %}
+					<tr>
+						{% for day in week %}
+							<td>
+								<a href="{% url 'day' year=day.month.year.year month=day.month.month day=day.day_of_month %}" class="day-of-month-number">{% if day.day_of_month == 1 %}{{ day.month.month_str|slice:'3' }}{% endif %} {{ day.day_of_month }}</a>
+								<br>
+								<div>
+									<ul>
+										{% for event in day.sorted_events %}
+											<li data-calendar-pk="{{ event.calendar.pk }}" {% if event.all_day %}style="background-color: {{ event.calendar.color }};" class="all-or-multi-day-event" {% else %} class="one-day-event" {% endif %}>
+												{% if not event.all_day%}
+													<span class="bullet" style="background-color: {{ event.calendar.color }};"></span>
+												{% endif %}
+												<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}">
+													{% if not event.all_day%}
+														{{ event.start_time|time:'f A' }}
+													{% endif %}
+													{{ event.title }}
+												</a>
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
+							</td>
+						{% endfor %}
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 
-	{% include 'calendar_filter.html' %}
+	<div class="col-sm-2">
+		{% include 'calendar_menu.html' %}
+	</div>
 
-	<h2>Calendars</h2>
-	<ul>
-	{% for calendar in calendars %}
-		<li><a href="{% url 'calendar_view' slug=calendar.slug %}" style="color: {{ calendar.color }};">{{ calendar.event_calendar }}</a></li>
-	{% endfor %}
-	</ul>
-
-	<h2>Locations</h2>
-	<ul>
-	{% for location in locations %}
-		<li><a href="{% url 'location_view' slug=location.slug %}">{{ location.location }}</a></li>
-	{% endfor %}
-	</ul>
-
+</div>
 </div>
 
 {% endblock %}

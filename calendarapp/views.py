@@ -1,10 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
+from django.contrib.sites.shortcuts import get_current_site
 from django.http import JsonResponse
 import json
 from django.utils import timezone
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 import datetime
 import time
+from django.template.loader import render_to_string
+from .tokens import account_activation_token
 from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
 from .forms import EventForm, CalendarForm, MemberCreationForm
 
@@ -119,6 +125,7 @@ def calendarWeekView(request, year, month, first_day_of_week):
 		'calendars': Calendar.objects.all().order_by('event_calendar'),
 		'shown_calendars': return_calendars(request, 'shown_calendars'),
 		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
+		'locations': Location.objects.all().order_by('location'),
 	})
 
 def calendarDayView(request, year, month, day):
@@ -139,6 +146,7 @@ def calendarDayView(request, year, month, day):
 		'calendars': Calendar.objects.all().order_by('event_calendar'),
 		'shown_calendars': return_calendars(request, 'shown_calendars'),
 		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
+		'locations': Location.objects.all().order_by('location'),
 	})
 
 def newEventView(request):
@@ -234,18 +242,46 @@ def locationView(request, slug):
 	return render(request, 'location_view.html', {'location': location, 'events': events})
 
 def signup(request):
+	if request.user.is_authenticated:
+		return redirect('home')
 	if request.method == 'POST':
 		form = MemberCreationForm(request.POST)
 		if form.is_valid():
-			user = form.save()
+			user = form.save(commit=False)
+			user.is_active = False
+			user.save()
 			user.refresh_from_db()
 			user.member.calendar_preferences.set(form.cleaned_data.get('calendar_preferences'))
 			user.save()
-			username = form.cleaned_data.get('username')
-			raw_password = form.cleaned_data.get('password1')
-			user = authenticate(username=username, password=raw_password)
-			login(request, user)
-			return redirect('home')
+			current_site = get_current_site(request)
+			subject = 'Activate Your Colman-Egan Calendar Account'
+			message = render_to_string('email/account_activation_email.html', {
+				'user': user,
+				'domain': current_site.domain,
+				'uid': force_text(urlsafe_base64_encode(force_bytes(user.pk))),
+				'token': account_activation_token.make_token(user),
+			})
+			user.email_user(subject, message)
+			return redirect('account_activation_sent')
 	else:
 		form = MemberCreationForm()
 	return render(request, 'registration/signup.html', {'form': form})
+
+def account_activation_sent(request):
+	return render(request, 'registration/account_activation_sent.html')
+
+def activate(request, uidb64, token):
+	try:
+		uid = force_text(urlsafe_base64_decode(uidb64))
+		user = User.objects.get(pk=uid)
+	except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+		user = None
+
+	if user is not None and account_activation_token.check_token(user, token):
+		user.is_active = True
+		user.member.email_confirmed = True
+		user.save()
+		login(request, user)
+		return redirect('home')
+	else:
+		return render(request, 'registration/account_activation_invalid.html')

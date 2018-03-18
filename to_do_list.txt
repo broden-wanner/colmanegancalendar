@@ -1,6 +1,14 @@
-2. Add email functionality
-3. Finally, style!
+2. Add email
+	-Reset user password
+	-Create admins to send emails (user superusers?)
+	-Add view to change user info
+	-If email changes, send confirmation email
+3. Use email
+	-Make it so email is sent to admins when someone wants to create an event
+	-Send email back to creator if approved or denied
 
+Host it, eventually.
+Continue styling...
 
 4. have ability to change between month, week, and day views without reloading
 5. maybe delete and edit events without reloading page

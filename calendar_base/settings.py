@@ -132,3 +132,4 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'SMTP_Injection'
 EMAIL_HOST_PASSWORD = '172134075868abfd926966396bd490efa2df9ffa'
 EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'Colman-Egan Calendar <mail@colmanegancalendar.com>'

@@ -1,0 +1,63 @@
+/* Used to set the table cells to a fixed width */
+#month-table {
+    table-layout: fixed;
+    width: 100%;
+    height: calc(100vh - 50px);
+}
+
+#month-table-container {
+	padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+#month-table td > div {
+	overflow-y: auto;
+	overflow-x: hidden;
+	white-space: nowrap;
+	height: 80%;
+	margin-top: 0.3em;
+}
+
+/* Gets rid of bullets in uls */
+#month-table td > div > ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+/* Gets rid of padding in tds */
+#month-table td {
+	padding: 0;
+}
+
+/* Sets days of week */
+#month-table tr:first-child td {
+	height: 1%;
+	text-align: center;
+}
+
+/* Customizes bullet next to event */
+.bullet {
+	height: 0.5em;
+	width: 0.5em;
+	background-color: #bbb;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+/* Edits spacing and text for event display */
+.all-or-multi-day-event {
+	width: 100%;
+}
+.all-or-multi-day-event > a {
+	color: white;
+	margin-left: 0.5em;
+}
+.one-day-event {
+	margin-left: 0.5em;
+}
+
+/* Sets the spacing for the number on the calendar */
+.day-of-month-number {
+	margin: 0.5em 0em 0.5em 0.5em;
+}

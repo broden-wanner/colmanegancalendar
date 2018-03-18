@@ -1,0 +1,95 @@
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/calendar_menu.css' %}">
+{% endblock %}
+
+<h2>Calendars <span class="dropup"><span class="caret" id="filter-calendars-link" style="cursor: pointer;"></span></span></h2>
+<ul id="filter-calendars-list">
+	{% for calendar in calendars %}
+	<li class="checkbox-container">
+		<label>
+			<input type="checkbox" name="filter-calendar" value="{{ calendar.pk }}" id="filter-calendar-{{ calendar.pk }}">
+			<span style="background-color: {{ calendar.color }};" data-color="{{ calendar.color }}" class="checkmark"></span>
+		</label>
+		<a href="{% url 'calendar_view' slug=calendar.slug %}">{{ calendar.event_calendar }}</a>
+	</li>
+	{% if not forloop.last %}
+		<hr>
+	{% endif %}
+	{% endfor %}
+</ul>
+
+<hr style="margin: 20px -15px 0 -15px;">
+
+<h2>Locations <span class="dropup"><span class="caret" id="locations-dropdown-link" style="cursor: pointer;"></span></h2>
+<ul id="locations-list">
+{% for location in locations %}
+	<li><a href="{% url 'location_view' slug=location.slug %}">{{ location.location }}</a></li>
+{% endfor %}
+</ul>
+
+<script type="text/javascript">
+	//Checks calendar checkboxes to hide based on user preferences and default calendars
+	{% for calendar in shown_calendars %}
+		$('input[name="filter-calendar"][value="{{ calendar.pk }}"]').prop('checked', true);
+	{% endfor %}
+
+	//Hide events based on user preferences and default calendars
+	{% for calendar in hidden_calendars %}
+		$('li[data-calendar-pk="{{ calendar.pk }}"]').hide();
+		$('input[name="filter-calendar"][value="{{ calendar.pk }}"]').next().css("background-color", "#eee");
+	{% endfor %}
+
+	//Show or hide calendar and location lists on click
+	$('#filter-calendars-link').click(function () {
+		$('#filter-calendars-list').toggle(200);
+		if($(this).parent().hasClass("dropup")) {
+			$(this).parent().removeClass("dropup");
+		} else {
+			$(this).parent().addClass("dropup");
+		}
+	});
+	$('#locations-dropdown-link').click(function() {
+		$('#locations-list').toggle(200);
+		if($(this).parent().hasClass("dropup")) {
+			$(this).parent().removeClass("dropup");
+		} else {
+			$(this).parent().addClass("dropup");
+		}
+	});
+
+	//Show and hide events based on checkboxes
+	$('input[name="filter-calendar"]').change(function () {
+		var calendars_to_show = [];
+		$('input[name="filter-calendar"]:checked').each(function() {
+			calendars_to_show.push(parseInt($(this).val()));
+			//Add background on checkbox
+			$(this).next().css("background-color", $(this).next().attr("data-color"));
+		});
+		//Show all events associated with chosen calendar
+		if(calendars_to_show.length) {
+			for(var i = 0; i < calendars_to_show.length; i++) {
+				$('li[data-calendar-pk="' + calendars_to_show[i] + '"]').show();
+			}
+		} else {
+			//Hide all calendars if there are none to show
+			$('li[data-calendar-pk]').hide();
+		}
+
+		var calendars_to_hide = [];
+		$('input[name="filter-calendar"]:not(:checked)').each(function() {
+			calendars_to_hide.push(parseInt($(this).val()));
+			//Get rid of background on checkbox
+			$(this).next().css("background-color", "#eee");
+		});
+		if(calendars_to_hide.length) {
+			for(var i = 0; i < calendars_to_hide.length; i++) {
+				$('li[data-calendar-pk="' + calendars_to_hide[i] + '"]').hide();
+			}
+		} else {
+			//Show all calendars if there are none to hide
+			$('li[data-calendar-pk]').show();
+		}
+	});
+</script>

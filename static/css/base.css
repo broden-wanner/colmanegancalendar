@@ -1,5 +1,7 @@
-body {
-	margin-top: 60px;
+.content {
+	margin-top: 50px;
+	height: calc(100vh - 50px);
+	overflow: hidden;
 }
 
 .navbar {
@@ -10,4 +12,9 @@ body {
 .dropdown:hover .dropdown-menu {
     display: block;
     margin-top: 0;
+ }
+
+ hr {
+ 	margin: 0;
+ 	padding: 0;
  }
