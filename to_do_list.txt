@@ -1,10 +1,10 @@
-3. Use email
+2. Use email
 	-Send email back to creator if approved or denied
 	-Add pending/approved events on user page
 	-Allow option to approve or edit before approval of event
 	-Email creator if admin changed event before approving it
 
-4. Admin
+3. Admin
 	-Allow admins to see all pending events and approve them from the page
 
 Host it, eventually.
