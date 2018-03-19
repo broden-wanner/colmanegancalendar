@@ -74,7 +74,7 @@ class Day(models.Model):
 
 	def sorted_events(self):
 		#Puts all-day events before timed events
-		return list(chain(self.event_set.filter(all_day=True).order_by('title'), self.event_set.exclude(all_day=True).order_by('start_time')))
+		return list(chain(self.event_set.filter(all_day=True, approved=True).order_by('title'), self.event_set.exclude(all_day=True).exclude(approved=False).order_by('start_time')))
 
 	def save(self, *args, **kwargs):
 		self.day_of_week_str = day_dictionary[self.day_of_week]
@@ -135,6 +135,7 @@ class DayOfWeek(models.Model):
 class Event(models.Model):
 	title = models.CharField(max_length=100)
 	creator = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
+	approved = models.BooleanField(default=False)
 	slug = models.SlugField(unique=False, blank=True, null=True)
 	event_info = models.TextField(blank=True)
 	location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, blank=True)

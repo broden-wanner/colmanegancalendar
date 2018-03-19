@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.models import User
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.models import User, Group
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from django.http import JsonResponse
 import json
 from django.utils import timezone
@@ -12,7 +13,8 @@ import time
 from django.template.loader import render_to_string
 from .tokens import account_activation_token
 from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
-from .forms import EventForm, CalendarForm, MemberCreationForm
+from .forms import EventForm, CalendarForm, MemberCreationForm, MemberChangeForm
+from django.conf import settings
 
 def return_calendars(request, option):
 	#Determines calendars to hide
@@ -155,9 +157,34 @@ def newEventView(request):
 		if new_event_form.is_valid():
 			new_event = new_event_form.save(commit=False)
 			new_event.creator = request.user
+			if Group.objects.get(name='Admins') in request.user.groups.all():
+				new_event.approved = True
 			new_event.save()
 			new_event.set_days_of_event()
-			return redirect('month', year=new_event.start_date.year, month=new_event.start_date.month)
+			if Group.objects.get(name='Admins') in request.user.groups.all():
+				return redirect('month', year=new_event.start_date.year, month=new_event.start_date.month)
+			else:
+				#Send email to admins if event created by non-admin
+				current_site = get_current_site(request)
+				subject = f'Approve Event {new_event.title} on {new_event.start_date}'
+				text_message = render_to_string('email/approve_event_email.html', {
+					'user': request.user,
+					'domain': current_site.domain,
+					'event': new_event,
+				})
+				html_message = render_to_string('email/approve_event_html_email.html', {
+					'user': request.user,
+					'domain': current_site.domain,
+					'event': new_event,
+				})
+				recipient_list = []
+				for admin in User.objects.filter(groups__name='Admins'):
+					recipient_list.append(admin.email)
+				msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, recipient_list)
+				msg.attach_alternative(html_message, 'text/html')
+				msg.send()
+				return redirect('event_approval_sent', slug=new_event.slug, pk=new_event.pk)
+
 	else:
 		start_time = timezone.localtime()
 		start_time = start_time - datetime.timedelta(seconds=start_time.minute*60)
@@ -169,11 +196,23 @@ def newEventView(request):
 			'end_time': end_time,
 			'repeat_every': 1,
 			'duration': 2,
-			'repeat_on': get_object_or_404(DayOfWeek, day_int=timezone.localtime().weekday() + 1 if timezone.localtime().weekday() < 7 else 0),
+			'repeat_on': get_object_or_404(DayOfWeek, day_int=(timezone.localtime().weekday() + 1 if timezone.localtime().weekday() < 6 else 0)),
 			'ends_on': (timezone.localtime() + datetime.timedelta(days=30)),
 		})
 
 	return render(request, 'new_event.html', {'new_event_form': new_event_form})
+
+def event_approval_sent(request, slug, pk):
+	return render(request, 'approve/event_approval_sent.html')
+
+def approve_event(request, slug, pk):
+	event = get_object_or_404(Event, slug=slug, pk=pk)
+	if Group.objects.get(name='Admins') in request.user.groups.all():
+		event.approved = True
+		event.save()
+		return redirect('month', year=event.start_date.year, month=event.start_date.month)
+	else:
+		return render(request, 'approve/event_disapproved.html')
 
 def calendarEventView(request, year, month, day, pk, slug):
 	event = get_object_or_404(Event, pk=pk, slug=slug)
@@ -267,6 +306,10 @@ def signup(request):
 		form = MemberCreationForm()
 	return render(request, 'registration/signup.html', {'form': form})
 
+def member_view(request, username):
+	created_events = Event.objects.filter(creator=request.user).order_by('start_date', 'start_time')
+	return render(request, 'registration/member_view.html', {'created_events': created_events})
+
 def account_activation_sent(request):
 	return render(request, 'registration/account_activation_sent.html')
 
@@ -285,3 +328,39 @@ def activate(request, uidb64, token):
 		return redirect('home')
 	else:
 		return render(request, 'registration/account_activation_invalid.html')
+
+def edit_member_info(request, username):
+	if request.method == 'POST':
+		form = MemberChangeForm(request.POST, instance=request.user)
+		if form.is_valid():
+			user = form.save(commit=False)
+			if form.has_changed():
+				if 'email' in form.changed_data:
+					logout(request)
+					user.is_active = False
+					user.email_confirmed = False
+					user.save()
+					user.refresh_from_db()
+					user.member.calendar_preferences.set(form.cleaned_data.get('calendar_preferences'))
+					user.save()
+					current_site = get_current_site(request)
+					subject = 'Colman-Egan Calendar Account Email Changed'
+					message = render_to_string('email/account_change_email.html', {
+						'user': user,
+						'domain': current_site.domain,
+						'uid': force_text(urlsafe_base64_encode(force_bytes(user.pk))),
+						'token': account_activation_token.make_token(user),
+					})
+					user.email_user(subject, message)
+					return redirect('account_email_change_sent')
+			user.save()
+			user.refresh_from_db()
+			user.member.calendar_preferences.set(form.cleaned_data.get('calendar_preferences'))
+			user.save()
+			return redirect('member_view', username=username)
+	else:
+		form = MemberChangeForm(instance=request.user, initial={'calendar_preferences': request.user.member.calendar_preferences.all()})
+	return render(request, 'registration/edit_profile.html', {'form': form})
+
+def account_email_change_sent(request):
+	return render(request, 'registration/account_email_change_sent.html')

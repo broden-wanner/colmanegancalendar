@@ -92,7 +92,7 @@
 				{# Displays the login/signup/logout links when appropriate #}
 		  		{% if request.path != '/accounts/login/' or request.path != '/accounts/signup/' %}
 					{% if user.is_authenticated %}
-						<li><p class="navbar-text"><span class="glyphicon glyphicon-user"></span> Hi, {{ user.username }}!</p></li>
+						<li><p class="navbar-text"><span class="glyphicon glyphicon-user"></span> <a href="{% url 'member_view' username=user.username %}"> Hi, {{ user.username }}!</a></p></li>
 						<li><a href="{% url 'logout' %}"> <span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
 					{% else %}
 						<li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>

@@ -1,11 +1,11 @@
-2. Add email
-	-Reset user password
-	-Create admins to send emails (user superusers?)
-	-Add view to change user info
-	-If email changes, send confirmation email
 3. Use email
-	-Make it so email is sent to admins when someone wants to create an event
 	-Send email back to creator if approved or denied
+	-Add pending/approved events on user page
+	-Allow option to approve or edit before approval of event
+	-Email creator if admin changed event before approving it
+
+4. Admin
+	-Allow admins to see all pending events and approve them from the page
 
 Host it, eventually.
 Continue styling...

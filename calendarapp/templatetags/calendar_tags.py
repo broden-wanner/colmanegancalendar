@@ -17,7 +17,7 @@ def new_event_or_calendar_links(template_url):
 		if url in template_url:
 			return False
 
-	urls_to_include = ['/day', '/month', '/week', '/event', '/calendar']
+	urls_to_include = ['/day', '/month', '/week', '/event', '/calendar', '/view']
 	for url in urls_to_include:
 		if url in template_url:
 			return True

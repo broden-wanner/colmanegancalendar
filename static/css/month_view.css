@@ -1,3 +1,9 @@
+/* Sets the height of the month view so that it does not overflow the space (50px is height of navbar)*/
+.content {
+	height: calc(100vh - 50px);
+	overflow: hidden;
+}
+
 /* Used to set the table cells to a fixed width */
 #month-table {
     table-layout: fixed;
