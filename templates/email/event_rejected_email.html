@@ -1,0 +1,6 @@
+{% autoescape off %}
+Hi, {{ user.username }}. The following event has been rejected.
+
+{% include 'email/event_snippet_raw_text.txt' %}
+
+{% endautoescape %}

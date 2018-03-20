@@ -6,7 +6,6 @@ from .models import Calendar, Event, Location, Member
 
 class EventAdmin(admin.ModelAdmin):
 	exclude = ('days', 'date_created', 'slug')
-	form = EventForm
 
 class CalendarAdmin(admin.ModelAdmin):
 	exclude = ('slug',)

@@ -1,24 +1,23 @@
 {% autoescape off %}
 {{ user.username }} wants to create the following event:
 
-{{ event.title }}
-Calendar: {{ event.calendar.event_calendar }}
-Event Info: {% if event.event_info %}{{ event.event_info }}{% else %}None{% endif %}
-Location: {% if event.location %}{{ event.location.location }}{% else %}None{% endif %}
-Starts: {{ event.start_date }}{% if not event.all_day %}, {{ event.start_time }}{% endif %}
-Ends: {{ event.end_date }}{% if not event.all_day %}, {{ event.end_time }}{% endif %}
-All day: {{ event.all_day|yesno:'Yes, No' }}
-Repeats: {{ event.repeat|yesno:'Yes, No' }}
-{% if event.repeat %}
-	Repeats every {{ event.repeat_every }} {{ event.get_duration_display }}{% if event.repeat_on and event.get_duration_display == 'Weeks' %} on {% for day in event.repeat_on.all %}{{ day.day_of_week }}{% if not forloop.last %}, {% endif%}{% endfor %}{% endif %}
-	{% if event.ends_on %}
-		Ends on {{ event.ends_on }}
-	{% elif event.ends_after %}
-		Ends after {{ event.ends_after }} occurences
-	{% endif %}
-{% endif %}
-Date Created: {{ event.date_created }}
+{% include 'email/event_snippet_raw_text.txt' %}
 
-Click the link below to approve the event
+{% if event_conflicts %}
+Event Conflicts:
+{% for event in event_conflicts %}
+	-{{ event.title }} going from {{ event.start_date }} {{ event.start_time }} to {{ event.end_date }} {{ event.end_time }}
+{% endfor %}
+{% else %}
+There are no event conflicts.
+{% endif %}
+
+Click the link below to approve the event as is:
 http://{{ domain }}{% url 'approve_event' slug=event.slug pk=event.pk %}
+
+If you want to make changes to the event before its creation, click the link below:
+http://{{ domain }}{% url 'edit_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}
+
+Click the link below to deny the event:
+http://{{ domain }}{% url 'reject_event' slug=event.slug pk=event.pk %}
 {% endautoescape %}

@@ -1,0 +1,28 @@
+{% autoescape off %}
+{{ user.username }} wants to make the following changes to this event:
+
+New Event:
+{% with changed_event as event %}
+{% include 'email/event_snippet_raw_text.txt' %}
+{% endwith %}
+
+Original Event:
+{% with original_event as event %}
+{% include 'email/event_snippet_raw_text.txt' %}
+{% endwith %}
+
+{% if changed_event_conflicts %}
+Event Conflicts:
+{% for event in changed_event_conflicts %}
+	-{{ event.title }} going from {{ event.start_date }} {{ event.start_time }} to {{ event.end_date }} {{ event.end_time }}
+{% endfor %}
+{% else %}
+There are no event conflicts.
+{% endif %}
+
+Click the link below to approve the event as is:
+http://{{ domain }}{% url 'approve_event_change' original_pk=original_event.pk original_slug=original_event.slug changed_slug=changed_event.slug changed_pk=changed_event.pk %}
+
+Click the link below to revert back to the original event:
+
+{% endautoescape %}

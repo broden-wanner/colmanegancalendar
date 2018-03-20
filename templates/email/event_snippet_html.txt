@@ -1,0 +1,18 @@
+<br>
+<h1>{{ event.title }}</h1>
+<p>Calendar: {{ event.calendar.event_calendar }}
+<p>Event Info: {% if event.event_info %}{{ event.event_info }}{% else %}None{% endif %}</p>
+<p>Location: {% if event.location %}{{ event.location.location }}{% else %}None{% endif %}</p>
+<p>Starts: {{ event.start_date }}{% if not event.all_day %}, {{ event.start_time }}{% endif %}</p>
+<p>Ends: {{ event.end_date }}{% if not event.all_day %}, {{ event.end_time }}{% endif %}</p>
+<p>All day: {{ event.all_day|yesno:'Yes, No' }}</p>
+<p>Repeats: {{ event.repeat|yesno:'Yes, No' }}</p>
+{% if event.repeat %}
+	<p>Repeats every {{ event.repeat_every }} {{ event.get_duration_display }}{% if event.repeat_on and event.get_duration_display == 'Weeks' %} on {% for day in event.repeat_on.all %}{{ day.day_of_week }}{% if not forloop.last %}, {% endif%}{% endfor %}{% endif %}</p>
+	{% if event.ends_on %}
+		<p>Ends on {{ event.ends_on }}</p>
+	{% elif event.ends_after %}
+		<p>Ends after {{ event.ends_after }} occurences</p>
+	{% endif %}
+{% endif %}
+<p>Date Created: {{ event.date_created }}</p>

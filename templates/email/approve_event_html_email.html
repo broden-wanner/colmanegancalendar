@@ -1,21 +1,18 @@
 <p>{{ user.username }} wants to create the following event:</p>
-<br>
-<h1>{{ event.title }}</h1>
-<p>Calendar: {{ event.calendar.event_calendar }}
-<p>Event Info: {% if event.event_info %}{{ event.event_info }}{% else %}None{% endif %}</p>
-<p>Location: {% if event.location %}{{ event.location.location }}{% else %}None{% endif %}</p>
-<p>Starts: {{ event.start_date }}{% if not event.all_day %}, {{ event.start_time }}{% endif %}</p>
-<p>Ends: {{ event.end_date }}{% if not event.all_day %}, {{ event.end_time }}{% endif %}</p>
-<p>All day: {{ event.all_day|yesno:'Yes, No' }}</p>
-<p>Repeats: {{ event.repeat|yesno:'Yes, No' }}</p>
-{% if event.repeat %}
-	<p>Repeats every {{ event.repeat_every }} {{ event.get_duration_display }}{% if event.repeat_on and event.get_duration_display == 'Weeks' %} on {% for day in event.repeat_on.all %}{{ day.day_of_week }}{% if not forloop.last %}, {% endif%}{% endfor %}{% endif %}</p>
-	{% if event.ends_on %}
-		<p>Ends on {{ event.ends_on }}</p>
-	{% elif event.ends_after %}
-		<p>Ends after {{ event.ends_after }} occurences</p>
-	{% endif %}
-{% endif %}
-<p>Date Created: {{ event.date_created }}</p>
 
-<p><a href="http://{{ domain }}{% url 'approve_event' slug=event.slug pk=event.pk %}">Click here to approve the event</a></p>
+{% include 'email/event_snippet_html.txt' %}
+
+{% if event_conflicts %}
+<p>Event Conflicts:</p>
+<ul>
+{% for event in event_conflicts %}
+	<li>{{ event.title }} going from {{ event.start_date }} {{ event.start_time }} to {{ event.end_date }} {{ event.end_time }}</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>There are no event conflicts.</p>
+{% endif %}
+
+<p><a href="http://{{ domain }}{% url 'approve_event' slug=event.slug pk=event.pk %}">Click here to approve the event as is.</a></p>
+<p><a href="http://{{ domain }}{% url 'edit_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">If you want to approve the event but make a few changes, click here.</a></p>
+<p><a href="http://{{ domain }}{% url 'reject_event' slug=event.slug pk=event.pk %}">Click here to completely reject the event</a></p>
