@@ -1,9 +1,11 @@
-Fix issue with event conflicts
+0.5 when hosting, use cron to delete unapproved events after four days
+
+delete event views and emails
+
+1. Create approval for calendars too (no edit though)
 
 2. Use email
 	-Add pending/approved events on user page
-	-Email creator if admin changed event before approving it
-	-Add editor field and send emails to editors on event change approval
 
 3. Admin
 	-Allow admins to see all pending events and approve them from the page

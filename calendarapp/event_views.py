@@ -19,9 +19,9 @@ def event_conflicts(test_event, original_event=None):
 	test_event_end_datetime = datetime.datetime.combine(test_event.end_date, test_event.end_time)
 	conflicts = []
 	if original_event:
-		events_to_search = Event.objects.exclude(pk__in=[test_event.pk, original_event.pk], all_day=True, approved=False)
+		events_to_search = Event.objects.exclude(pk__in=[test_event.pk, original_event.pk]).exclude(all_day=True).exclude(approved=False)
 	else:
-		events_to_search = Event.objects.exclude(pk=test_event.pk, all_day=True, approved=False)
+		events_to_search = Event.objects.exclude(pk=test_event.pk).exclude(all_day=True).exclude(approved=False)
 	for event in events_to_search:
 		event_start_datetime = datetime.datetime.combine(event.start_date, event.start_time)
 		event_end_datetime = datetime.datetime.combine(event.end_date, event.end_time)
@@ -89,15 +89,14 @@ def event_approval_sent(request, slug, pk):
 def approve_event(request, slug, pk):
 	event = get_object_or_404(Event, slug=slug, pk=pk)
 	if Group.objects.get(name='Admins') in request.user.groups.all():
-		event.approved = True
-		event.save()
 		#Send an email to the user if their email is confirmed to tell them about the event
-		if event.creator.member.email_confirmed:
+		if event.creator.member.email_confirmed and event.approved == False:
+			event.approved = True
+			event.save()
 			current_site = get_current_site(request)
 			subject = f'Event Approved: {event.title} on {event.start_date}'
 			content = {
 				'user': event.creator,
-				'domain': current_site.domain,
 				'event': event,
 			}
 			text_message = render_to_string('email/event_approved_email.html', content)
@@ -105,12 +104,18 @@ def approve_event(request, slug, pk):
 			msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, [event.creator.email])
 			msg.attach_alternative(html_message, 'text/html')
 			msg.send()
-		return redirect('month', year=event.start_date.year, month=event.start_date.month)
+			return redirect('month', year=event.start_date.year, month=event.start_date.month)
+		#If already approved, don't send email and tell user that it is already approved
+		else:
+			return render(request, 'approve/event_already_approved.html')
 	else:
 		return render(request, 'approve/event_approval_error.html')
 
 def reject_event(request, slug, pk):
-	event = get_object_or_404(Event, slug=slug, pk=pk)
+	try:
+		event = Event.objects.get(slug=slug, pk=pk)
+	except Event.DoesNotExist:
+		return render(request, 'approve/event_already_rejected.html')
 	if Group.objects.get(name='Admins') in request.user.groups.all():
 		#Send an email to the user if their email is confirmed to tell them about the event
 		if event.creator.member.email_confirmed:
@@ -118,7 +123,6 @@ def reject_event(request, slug, pk):
 			subject = f'Event Rejected: {event.title} on {event.start_date}'
 			content = {
 				'user': event.creator,
-				'domain': current_site.domain,
 				'event': event,
 			}
 			text_message = render_to_string('email/event_rejected_email.html', content)
@@ -136,12 +140,15 @@ def calendarEventView(request, year, month, day, pk, slug):
 	return render(request, 'event_view.html', {'event': event})
 
 def editEventView(request, year, month, day, pk, slug):
-	event = Event.objects.get(pk=pk, slug=slug)
+	event = get_object_or_404(Event, pk=pk, slug=slug)
 	if request.method == 'POST':
 		event_form = EventForm(request.POST, instance=event)
 		if event_form.is_valid():
 			if event_form.has_changed():
-				changed_event = event_form.save()
+				changed_event = event_form.save(commit=False)
+				changed_event.editor = request.user
+				changed_event.edited_time = timezone.now()
+				changed_event.save()
 				changed_event.set_days_of_event()
 				original_event = Event.objects.get(pk=request.session['original_event_pk'])
 				if Group.objects.get(name='Admins') in request.user.groups.all():
@@ -187,7 +194,10 @@ def editEventView(request, year, month, day, pk, slug):
 		#Creates copy of event and stores it in session data
 		if 'original_event_pk' in request.session:
 			#Delete the event stored in the original_event key
-			Event.objects.get(pk=request.session['original_event_pk']).delete()
+			try:
+				Event.objects.get(pk=request.session['original_event_pk']).delete()
+			except Event.DoesNotExist:
+				pass
 			#Delete the key
 			del request.session['original_event_pk']
 			#Create event copy
@@ -220,28 +230,52 @@ def deleteEventView(request, year, month, day, pk, slug):
 	return render(request, 'delete_event.html', {'event': event})
 
 def approve_event_change(request, original_slug, original_pk, changed_slug, changed_pk):
-	get_object_or_404(Event, slug=original_slug, pk=original_pk).delete()
-	event = get_object_or_404(Event, slug=changed_slug, pk=changed_pk)
+	try:
+		Event.objects.get(slug=original_slug, pk=original_pk).delete()
+		changed_event = Event.objects.get(slug=changed_slug, pk=changed_pk)
+	except Event.DoesNotExist:
+		return render(request, 'approve/event_already_approved.html')
 	if Group.objects.get(name='Admins') in request.user.groups.all():
-		event.approved = True
-		event.save()
+		changed_event.approved = True
+		changed_event.save()
 		#Send an email to the user if their event change is confirmed to tell them about the event
-		if event.creator.member.email_confirmed:
-			current_site = get_current_site(request)
-			subject = f'Event Change Approved: {event.title} on {event.start_date}'
-			content = {
-				'user': event.creator,
-				'domain': current_site.domain,
-				'event': event,
-			}
-			text_message = render_to_string('email/event_change_approved_email.html', content)
-			html_message = render_to_string('email/event_change_approved_html_email.html', content)
-			msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, [event.creator.email])
-			msg.attach_alternative(html_message, 'text/html')
-			msg.send()
-		return redirect('month', year=event.start_date.year, month=event.start_date.month)
+		subject = f'Event Change Approved: {changed_event.title} on {changed_event.start_date}'
+		content = {'event': changed_event}
+		text_message = render_to_string('email/event_change_approved_email.html', content)
+		html_message = render_to_string('email/event_change_approved_html_email.html', content)
+		recipients = []
+		if changed_event.editor != changed_event.creator:
+			recipients.append(changed_event.creator.email)
+		recipients.append(changed_event.editor.email)
+		msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, recipients)
+		msg.attach_alternative(html_message, 'text/html')
+		msg.send()
+		return redirect('month', year=changed_event.start_date.year, month=changed_event.start_date.month)
 	else:
 		return render(request, 'approve/event_approval_error.html')
 
-def reject_event_change(request, slug, pk):
-	pass
+def reject_event_change(request, original_slug, original_pk, changed_slug, changed_pk):
+	try:
+		changed_event = Event.objects.get(slug=changed_slug, pk=changed_pk)
+		original_event = Event.objects.get(slug=original_slug, pk=original_pk)
+	except Event.DoesNotExist:
+		return render(request, 'approve/event_already_rejected.html')
+	if Group.objects.get(name='Admins') in request.user.groups.all():
+		original_event.approved = True
+		original_event.save()
+		#Send an email to the user if their event is denied
+		subject = f'Event Change Rejected: {changed_event.title} on {changed_event.start_date}'
+		content = {'event': changed_event}
+		text_message = render_to_string('email/event_change_rejected_email.html', content)
+		html_message = render_to_string('email/event_change_rejected_html_email.html', content)
+		recipients = []
+		if changed_event.editor != changed_event.creator:
+			recipients.append(changed_event.creator.email)
+		recipients.append(changed_event.editor.email)
+		msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, recipients)
+		msg.attach_alternative(html_message, 'text/html')
+		msg.send()
+		changed_event.delete()
+		return redirect('month', year=event.start_date.year, month=event.start_date.month)
+	else:
+		return render(request, 'approve/event_approval_error.html')

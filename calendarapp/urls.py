@@ -17,6 +17,7 @@ urlpatterns = [
 	path('event/reject/<int:pk>/<slug:slug>/', event_views.reject_event, name='reject_event'),
 	path('event/approval-sent/<int:pk>/<slug:slug>/', event_views.event_approval_sent, name='event_approval_sent'),
 	path('event/approve-change/<int:original_pk>/<slug:original_slug>/<int:changed_pk>/<slug:changed_slug>/', event_views.approve_event_change, name='approve_event_change'),
+	path('event/reject-change/<int:original_pk>/<slug:original_slug>/<int:changed_pk>/<slug:changed_slug>/', event_views.reject_event_change, name='reject_event_change'),
 	path('calendar/new/', views.newCalendarView, name='new_calendar'),
 	path('calendar/<slug:slug>/', views.calendarView, name='calendar_view'),
 	path('calendar/<slug:slug>/edit/', views.editCalendarView, name='edit_calendar'),

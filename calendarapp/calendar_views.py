@@ -23,10 +23,17 @@ def return_calendars(request, option):
 	elif option == 'hidden_calendars':
 		return hidden_calendars
 
+def delete_unapproved_events_after_4_days():
+	for event in Event.objects.filter(approved=False):
+		if event.edited_time + datetime.timedelta(days=4) < timezone.now():
+			event.delete()
+
 def calendarHomeView(request):
+	delete_unapproved_events_after_4_days()
 	return redirect('month', year=timezone.now().year, month=timezone.now().month)
 
 def calendarMonthView(request, year, month):
+	delete_unapproved_events_after_4_days()
 	current_year = get_object_or_404(Year, year=year)
 	current_month = get_object_or_404(Month, year=current_year, month=month)		
 	days_of_month = get_list_or_404(Day, month=current_month)
@@ -97,6 +104,7 @@ def calendarMonthView(request, year, month):
 	})
 
 def calendarWeekView(request, year, month, first_day_of_week):
+	delete_unapproved_events_after_4_days()
 	this_year = get_object_or_404(Year, year=year)
 	this_month = get_object_or_404(Month, year=this_year, month=month)
 	first_day = get_object_or_404(Day, month=this_month, day_of_month=first_day_of_week)
@@ -119,6 +127,7 @@ def calendarWeekView(request, year, month, first_day_of_week):
 	})
 
 def calendarDayView(request, year, month, day):
+	delete_unapproved_events_after_4_days()
 	this_year = get_object_or_404(Year, year=year)
 	this_month = get_object_or_404(Month, year=this_year, month=month)
 	this_day = get_object_or_404(Day, month=this_month, day_of_month=day)

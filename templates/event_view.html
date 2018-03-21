@@ -18,8 +18,10 @@
 				<p>Ends after {{ event.ends_after }} occurences</p>
 			{% endif %}
 		{% endif %}
-		<p>Date Created: {{ event.date_created }}</p>
-		<p>Created by {{ event.creator.username }}</p>
+		<p>Created by: {{ event.creator.username }} on {{ event.date_created }}</p>
+		{% if event.editor %}
+		<p>Edited by: {{ event.editor }} on {{ event.edited_time }}</p>
+		{% endif %}
 
 		{% if perms.calendarapp.change_event %}
 			<p><a href="{% url 'edit_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Edit Event</a></p>

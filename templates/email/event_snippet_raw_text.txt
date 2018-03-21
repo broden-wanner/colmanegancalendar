@@ -14,4 +14,7 @@ Repeats: {{ event.repeat|yesno:'Yes, No' }}
 		Ends after {{ event.ends_after }} occurences
 	{% endif %}
 {% endif %}
-Date Created: {{ event.date_created }}
+Created by: {{ event.creator.username }} on {{ event.date_created }}
+{% if event.editor %}
+Edited by: {{ event.editor }} on {{ event.edited_time }}
+{% endif %}

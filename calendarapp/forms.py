@@ -9,7 +9,8 @@ class EventForm(forms.ModelForm):
 		queryset=Calendar.objects.all().order_by('event_calendar')
 	)
 	location = forms.ModelChoiceField(
-		queryset=Location.objects.all().order_by('location')
+		queryset=Location.objects.all().order_by('location'),
+		required=False
 	)
 	start_date = forms.DateField(
 		input_formats=['%m/%d/%Y'],

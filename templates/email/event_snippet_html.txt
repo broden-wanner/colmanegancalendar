@@ -15,4 +15,7 @@
 		<p>Ends after {{ event.ends_after }} occurences</p>
 	{% endif %}
 {% endif %}
-<p>Date Created: {{ event.date_created }}</p>
+<p>Created by: {{ event.creator.username }} on {{ event.date_created }}</p>
+{% if event.editor %}
+<p>Edited by: {{ event.editor }} on {{ event.edited_time }}</p>
+{% endif %}

@@ -23,6 +23,7 @@ There are no event conflicts.
 Click the link below to approve the event as is:
 http://{{ domain }}{% url 'approve_event_change' original_pk=original_event.pk original_slug=original_event.slug changed_slug=changed_event.slug changed_pk=changed_event.pk %}
 
-Click the link below to revert back to the original event:
+Click the link below to leave the original event unchanged and delete the changed event:
+http://{{ domain }}{% url 'reject_event_change' original_pk=original_event.pk original_slug=original_event.slug changed_slug=changed_event.slug changed_pk=changed_event.pk %}
 
 {% endautoescape %}

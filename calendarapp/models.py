@@ -134,10 +134,11 @@ class DayOfWeek(models.Model):
 
 class Event(models.Model):
 	title = models.CharField(max_length=100)
-	creator = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
 	approved = models.BooleanField(default=False)
-	slug = models.SlugField(unique=False, blank=True, null=True)
+	creator = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, related_name='creator')
+	editor = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='editor')
 	event_info = models.TextField(blank=True)
+	calendar = models.ForeignKey('Calendar', on_delete=models.CASCADE)
 	location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, blank=True)
 	days = models.ManyToManyField('Day')
 	start_date = models.DateField()
@@ -145,8 +146,8 @@ class Event(models.Model):
 	end_date = models.DateField()
 	end_time = models.TimeField()
 	all_day = models.BooleanField(default=False)
-	calendar = models.ForeignKey('Calendar', on_delete=models.CASCADE)
 	date_created = models.DateTimeField(default=timezone.now)
+	edited_time = models.DateTimeField(default=timezone.now)
 	#Repeating fields
 	repeat = models.BooleanField(default=False)
 	repeat_every = models.PositiveIntegerField(default=1, blank=True, null=True)
@@ -158,6 +159,7 @@ class Event(models.Model):
 	repeat_on = models.ManyToManyField('DayOfWeek', blank=True)
 	ends_on = models.DateField(blank=True, null=True)
 	ends_after = models.PositiveIntegerField(blank=True, null=True)
+	slug = models.SlugField(unique=False, blank=True, null=True)
 
 	def __str__(self):
 		return self.title
@@ -283,7 +285,6 @@ class Event(models.Model):
 	def save(self, *args, **kwargs):
 		self.title = self.title.title()
 		self.slug = slugify(self.title)
-		self.date_created = timezone.now()
 		self.full_clean()
 		super(Event, self).save(*args, **kwargs)
 		self.set_days_of_event()

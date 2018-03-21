@@ -24,4 +24,4 @@
 
 <p><a href="http://{{ domain }}{% url 'approve_event_change' original_pk=original_event.pk original_slug=original_event.slug changed_slug=changed_event.slug changed_pk=changed_event.pk %}">Click here to approve the event change.</a></p>
 
-<p>Click the link below to revert back to the original event:</p>
+<p><a href="http://{{ domain }}{% url 'reject_event_change' original_pk=original_event.pk original_slug=original_event.slug changed_slug=changed_event.slug changed_pk=changed_event.pk %}">Click here to leave the event unchanged and delete the changed event</a></p>
