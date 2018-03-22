@@ -1,6 +1,7 @@
 0.5 when hosting, use cron to delete unapproved events after four days
 
 1. Create approval for calendars too (no edit or delete though)
+1.3. Do it for locations
 
 2. Add pending/approved events on user page
 

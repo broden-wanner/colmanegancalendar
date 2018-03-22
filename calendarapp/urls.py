@@ -1,8 +1,9 @@
 from django.urls import path
-from . import views
 from . import calendar_views
 from . import event_views
+from . import event_calendar_views
 from . import account_views
+from . import location_views
 
 #Calendar views
 urlpatterns = [
@@ -30,11 +31,15 @@ urlpatterns += [
 
 #Calendar Views
 urlpatterns += [
-	path('calendar/new/', views.newCalendarView, name='new_calendar'),
-	path('calendar/<slug:slug>/', views.calendarView, name='calendar_view'),
-	path('calendar/<slug:slug>/edit/', views.editCalendarView, name='edit_calendar'),
-	path('calendar/<slug:slug>/delete/', views.deleteCalendarView, name='delete_calendar'),
-	path('location/<slug:slug>/', views.locationView, name='location_view'),
+	path('calendar/new/', event_calendar_views.newCalendarView, name='new_calendar'),
+	path('calendar/<slug:slug>/', event_calendar_views.calendarView, name='calendar_view'),
+	path('calendar/<slug:slug>/edit/', event_calendar_views.editCalendarView, name='edit_calendar'),
+	path('calendar/<slug:slug>/delete/', event_calendar_views.deleteCalendarView, name='delete_calendar'),
+]
+
+#Location Views
+urlpatterns += [
+	path('location/<slug:slug>/', location_views.locationView, name='location_view'),
 ]
 
 #Account Views

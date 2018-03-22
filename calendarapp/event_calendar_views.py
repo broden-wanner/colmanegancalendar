@@ -1,15 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User, Group
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from django.utils import timezone
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 import datetime
 import time
 from django.template.loader import render_to_string
-from .tokens import account_activation_token
 from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
 from .forms import EventForm, CalendarForm, MemberCreationForm, MemberChangeForm
 from django.conf import settings
@@ -50,8 +46,3 @@ def deleteCalendarView(request, slug):
 		calendar.delete()
 		return redirect('month', year=timezone.now().year, month=timezone.now().month)
 	return render(request, 'delete_calendar.html', {'calendar': calendar})
-
-def locationView(request, slug):
-	location = get_object_or_404(Location, slug=slug)
-	events = Event.objects.filter(location=location).order_by('start_date', 'start_time')
-	return render(request, 'location_view.html', {'location': location, 'events': events})
