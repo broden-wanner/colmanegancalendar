@@ -1,6 +1,10 @@
 {% autoescape off %}
-Hi, {{ user.username }}. The following event has been rejected.
+Hi, {{ user.username }}. The following event has been rejected because of the following reason.
 
+Reason:
+{{ reason }}
+
+Event:
 {% include 'email/event_snippet_raw_text.txt' %}
 
 {% endautoescape %}

@@ -1,3 +1,7 @@
-<p>Hi, {{ event.editor.username }}{% if event.editor.username != event.creator.username %} and {{ event.creator.username}}{% endif %}. The following changed event has been rejected:</p>
+<p>Hi, {{ event.editor.username }}. The following event change has been rejected because of the following reason.</p>
 
+<p>Reason:</p>
+<p>{{ reason }}</p>
+
+<p>Event:</p>
 {% include 'email/event_snippet_html.txt' %}

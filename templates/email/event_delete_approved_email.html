@@ -1,0 +1,19 @@
+{% autoescape off %}
+Hi, {{ event.creator.username }}{% if event.creator != deleting_user %} and {{ deleting_user.username }}{% endif %}. The following event has been deleted for the following reason:
+
+Reason:
+{{ reason }}
+
+Event:
+{% include 'email/event_snippet_raw_text.txt' %}
+
+{% if event_conflicts %}
+Event Conflicts:
+{% for event in event_conflicts %}
+	-{{ event.title }} going from {{ event.start_date }} {{ event.start_time }} to {{ event.end_date }} {{ event.end_time }}
+{% endfor %}
+{% else %}
+There are no event conflicts.
+{% endif %}
+
+{% endautoescape %}

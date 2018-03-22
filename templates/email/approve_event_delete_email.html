@@ -1,0 +1,24 @@
+{% autoescape off %}
+{{ user.username }} wants to delete the following event for the following reason:
+
+Reason:
+{{ reason }}
+
+Event:
+{% include 'email/event_snippet_raw_text.txt' %}
+
+{% if event_conflicts %}
+Event Conflicts:
+{% for event in event_conflicts %}
+	-{{ event.title }} going from {{ event.start_date }} {{ event.start_time }} to {{ event.end_date }} {{ event.end_time }}
+{% endfor %}
+{% else %}
+There are no event conflicts.
+{% endif %}
+
+Click the link below to delete the event:
+http://{{ domain }}{% url 'approve_event_delete' slug=event.slug pk=event.pk deleting_user_pk=user.pk %}
+
+Click the link below to deny the deletion of the event:
+http://{{ domain }}{% url 'reject_event_delete' slug=event.slug pk=event.pk deleting_user_pk=user.pk %}
+{% endautoescape %}

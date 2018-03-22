@@ -1,17 +1,15 @@
-<p>{{ user.username }} wants to make the following changes to this event:</p>
+<p>{{ user.username }} wants to make the following changes to this event for the following reason:</p>
+
+<p>Reason:</p>
+<p>{{ reason }}</p>
 
 <p>New Event:</p>
 {% with changed_event as event %}
 {% include 'email/event_snippet_html.txt' %}
 {% endwith %}
 
-<p>Original Event:</p>
-{% with original_event as event %}
-{% include 'email/event_snippet_html.txt' %}
-{% endwith %}
-
 {% if changed_event_conflicts %}
-<p>Event Conflicts:</p>
+<p>New Event Conflicts:</p>
 <ul>
 {% for event in changed_event_conflicts %}
 	<li>{{ event.title }} going from {{ event.start_date }} {{ event.start_time }} to {{ event.end_date }} {{ event.end_time }}</li>
@@ -21,6 +19,21 @@
 <p>There are no event conflicts.</p>
 {% endif %}
 
+<p>Original Event:</p>
+{% with original_event as event %}
+{% include 'email/event_snippet_html.txt' %}
+{% endwith %}
+
+{% if original_event_conflicts %}
+<p>Original Event Conflicts:</p>
+<ul>
+{% for event in original_event_conflicts %}
+	<li>{{ event.title }} going from {{ event.start_date }} {{ event.start_time }} to {{ event.end_date }} {{ event.end_time }}</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>There are no event conflicts.</p>
+{% endif %}
 
 <p><a href="http://{{ domain }}{% url 'approve_event_change' original_pk=original_event.pk original_slug=original_event.slug changed_slug=changed_event.slug changed_pk=changed_event.pk %}">Click here to approve the event change.</a></p>
 

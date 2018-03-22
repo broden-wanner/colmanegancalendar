@@ -80,6 +80,30 @@ class EventForm(forms.ModelForm):
 		if repeat and duration == '2' and not repeat_on:
 			self.add_error('repeat_on', 'If repeating weekly, this field must be filled')
 
+class ReasonForEventEditForm(forms.Form):
+	reason = forms.CharField(
+		required=True,
+		label='Reason for editing the event:'
+	)
+
+class ReasonForEventRejectForm(forms.Form):
+	reason = forms.CharField(
+		required=True,
+		label='Reason for rejecting the event:'
+	)
+
+class ReasonForEventDeleteForm(forms.Form):
+	reason = forms.CharField(
+		required=True,
+		label='Reason for deleting the event:'
+	)
+
+class ReasonForEventDeleteRejectForm(forms.Form):
+	reason = forms.CharField(
+		required=True,
+		label='Reason for not deleting the event:'
+	)
+
 class CalendarForm(forms.ModelForm):
 
 	class Meta:

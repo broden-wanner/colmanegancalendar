@@ -1,0 +1,18 @@
+<p>Hi, {{ event.creator.username }}{% if event.creator != deleting_user %} and {{ deleting_user.username }}{% endif %}. The following event has been deleted for the following reasons:</p>
+
+<p>Reason:</p>
+<p>{{ reason }}</p>
+
+<p>Event:</p>
+{% include 'email/event_snippet_html.txt' %}
+
+{% if event_conflicts %}
+<p>Event Conflicts:</p>
+<ul>
+{% for event in event_conflicts %}
+	<li>{{ event.title }} going from {{ event.start_date }} {{ event.start_time }} to {{ event.end_date }} {{ event.end_time }}</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>There are no event conflicts.</p>
+{% endif %}

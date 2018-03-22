@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+	<h1>Tell the user why their request was rejected...</h1>
+	<form method="POST" enctype="multipart/form-data">
+		{% csrf_token %}
+		{{ reason_form.as_p }}
+		<button type="submit" value="reject_event">Reject Request</button>
+	</form>
+</div>
+{% endblock %}
