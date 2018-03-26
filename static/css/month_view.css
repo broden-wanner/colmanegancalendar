@@ -67,3 +67,15 @@
 .day-of-month-number {
 	margin: 0.5em 0em 0.5em 0.5em;
 }
+
+/* Creates today circle for day */
+.today-number, .today-number:hover {
+	background: black;
+	height: 1.5em;
+	width: 1.5em;
+	text-align: center;
+	color: white;
+	border-radius: 50%;
+	display: inline-block;
+	margin: 0 0 -0.5em 0;
+} 

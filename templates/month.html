@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load humanize %}
+
 {% load staticfiles %}
 
 {% block css %}
@@ -27,20 +27,20 @@
 					<tr>
 						{% for day in week %}
 							<td>
-								<a href="{% url 'day' year=day.month.year.year month=day.month.month day=day.day_of_month %}" class="day-of-month-number">{% if day.day_of_month == 1 %}{{ day.month.month_str|slice:'3' }}{% endif %} {{ day.day_of_month }}</a>
+								<a href="{% url 'day' year=day.month.year.year month=day.month.month day=day.day_of_month %}" class="day-of-month-number {% if day.month.year.year == today.year and day.month.month == today.month and day.day_of_month == today.day %}today-number{% endif %}">{% if day.day_of_month == 1 %}{{ day.month.month_str|slice:'3' }}{% endif %} {{ day.day_of_month }}</a>
 								<br>
 								<div>
 									<ul>
 										{% for event in day.sorted_events %}
-											<li data-calendar-pk="{{ event.calendar.pk }}" {% if event.all_day %}style="background-color: {{ event.calendar.color }};" class="all-or-multi-day-event" {% else %} class="one-day-event" {% endif %}>
-												{% if not event.all_day%}
+											<li data-calendar-pk="{{ event.calendar.pk }}" {% if event.all_day or event.start_date.day != event.end_date.day %}style="background-color: {{ event.calendar.color }};" class="all-or-multi-day-event" {% else %} class="one-day-event" {% endif %}>
+												{% if not event.all_day and event.start_date.day == event.end_date.day%}
 													<span class="bullet" style="background-color: {{ event.calendar.color }};"></span>
 												{% endif %}
 												<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}">
-													{% if not event.all_day%}
+													{% if not event.all_day and event.start_date.day == day.day_of_month and event.start_date.month == day.month.month %}
 														{{ event.start_time|time:'f A' }}
 													{% endif %}
-													{{ event.title }}
+													{{ event.title }} {% if event.start_date.day != day.day_of_month %}(continued){% endif %}
 												</a>
 											</li>
 										{% endfor %}

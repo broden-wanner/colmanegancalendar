@@ -1,0 +1,69 @@
+/* Set font-size of the days of the month numbers */
+div.day-of-month {
+	font-size: 3em;
+}
+
+/* Fixes the width of the table */
+#week-table {
+    table-layout: fixed;
+    width: 100%;
+    min-height: calc(100vh - 50px);
+    margin-bottom: 0 !important;
+}
+
+/* Gets rid of padding around the table*/
+#week-table-container {
+	padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Handles overflow of events */
+#week-table td > div {
+	overflow-x: hidden;
+	white-space: nowrap;
+}
+
+/* Gets rid of bullets in uls */
+#week-table td > div > ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+/* Spaces out list items as the appear on the week view of the calendar */
+#week-table td > div > ul > li,  #week-table td > div > p {
+	padding: 1em 0 1em 0;
+}
+
+/* Gets rid of padding in tds */
+#week-table td {
+	padding: 0;
+}
+
+/* Sets days of week */
+#week-table tr:first-child th {
+	height: 1%;
+}
+
+/* Customizes bullet next to event */
+.bullet {
+	height: 0.5em;
+	width: 0.5em;
+	background-color: #bbb;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+/* Edits spacing and text for event display */
+.all-or-multi-day-event {
+	width: 100%;
+}
+.all-or-multi-day-event > a {
+	color: white;
+	margin-left: 0.5em;
+}
+.one-day-event {
+	margin-left: 0.5em;
+	color: #9d9d9d;
+}
+

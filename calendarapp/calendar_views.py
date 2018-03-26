@@ -91,6 +91,7 @@ def calendarMonthView(request, year, month):
 
 	return render(request, 'month.html', {
 		'type_of_view': 'Month',
+		'today': timezone.localtime(),
 		'day_view_day': first_day_of_week,
 		'month_weeks': calendar_rows,
 		'current_month': current_month,

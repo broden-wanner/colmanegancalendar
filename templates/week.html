@@ -1,42 +1,63 @@
 {% extends 'base.html' %}
 
-{% load humanize %}
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/week_view.css' %}">
+{% endblock %}
 
 {% block content %}
 
-<div class="container">
-	<h1>Week of {{ week.first.month.month_str }} {{ week.first.day_of_month|ordinal }}, {{ week.first.month.year.year }}</h1>
-	<table class="table table-bordered">
-		<tr>
-			{% for day in week %}
-				<th><a href="{% url 'day' year=day.month.year.year month=day.month.month day=day.day_of_month %}">{{ day.day_of_week_str }}, {{ day.month.month_str }} {{ day.day_of_month|ordinal }}</a></th>
-			{% endfor %}
-		</tr>
-		<tr>
-			{% for day in week %}
-				<td>
-					{% if not day.sorted_events %}
-						<p>No events scheduled</p>
-					{% else %}
-					<ul>
-						{% for event in day.sorted_events %}
-							<li data-calendar-pk="{{ event.calendar.pk }}">
-								<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}" style="color: {{ event.calendar.color }};">
-								{% if not event.all_day%}
-									{{ event.start_time|time:'f A' }}
-								{% endif %}
-								{{ event.title }} {% if event.all_day %}(All-day){% endif %}</a>
-							</li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</td>
-			{% endfor %}
-		</tr>
-	</table>
+<div class="container-fluid">
+<div class="row">
 
-	{% include 'calendar_menu.html' %}
+	<div class="col-sm-10 table-responsive" id="week-table-container">	
+		<table class="table table-bordered" id="week-table">
+			<tr>
+				{% for day in week %}
+					<th><a href="{% url 'day' year=day.month.year.year month=day.month.month day=day.day_of_month %}">
+						<div class="day-of-week">{{ day.day_of_week_str|slice:"3" }}</div>
+						<div class="day-of-month">{{ day.day_of_month }}</div>
+					</a></th>
+				{% endfor %}
+			</tr>
+			<tr>
+				{% for day in week %}
+					<td>
+						{% if not day.sorted_events %}
+							<div>
+								<p class="one-day-event">No events scheduled</p>
+							</div>
+						{% else %}
+						<div>
+							<ul>
+								{% for event in day.sorted_events %}
+									<li data-calendar-pk="{{ event.calendar.pk }}" {% if event.all_day or event.start_date.day != event.end_date.day %}style="background-color: {{ event.calendar.color }};" class="all-or-multi-day-event" {% else %} class="one-day-event" {% endif %}>
+										{% if not event.all_day and event.start_date.day == event.end_date.day%}
+											<span class="bullet" style="background-color: {{ event.calendar.color }};"></span>
+										{% endif %}
+										<a href="{% url 'event_view' year=day.month.year.year month=day.month.month day=day.day_of_month pk=event.pk slug=event.slug %}">
+											{% if not event.all_day and event.start_date.day == day.day_of_month and event.start_date.month == day.month.month %}
+												{{ event.start_time|time:'f A' }}
+											{% endif %}
+											{{ event.title }} {% if event.start_date.day != day.day_of_month %}(continued){% endif %}
+										</a>
+									</li>
+								{% endfor %}
+							</ul>
+						</div>
+						{% endif %}
+					</td>
+				{% endfor %}
+			</tr>
+		</table>
+	</div>
 
+	<div class="col-sm-2">
+		{% include 'calendar_menu.html' %}
+	</div>
+
+</div>
 </div>
 
 {% endblock %}

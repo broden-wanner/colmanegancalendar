@@ -73,8 +73,28 @@ class Day(models.Model):
 		return '%i of %s %i' % (self.day_of_month, self.month.month_str, int(self.month.year.year))
 
 	def sorted_events(self):
+		all_day_events = list(self.event_set.filter(all_day=True, approved=True))
+		#Get events that last more than one day
+		sorted_all_day_events = [event for event in all_day_events if event.end_date - event.start_date > datetime.timedelta(days=1)]
+		#Sort them based on start date
+		sorted_all_day_events.sort(key=lambda event: event.start_date)
+		#Add the one-day all-day events at the end
+		for event in all_day_events:
+			if event not in sorted_all_day_events:
+				sorted_all_day_events.append(event)
+
+		timed_events = list(self.event_set.filter(all_day=False, approved=True).order_by('start_time'))
+		#Get events that last more than one day
+		sorted_timed_events = [event for event in timed_events if event.end_date - event.start_date > datetime.timedelta(days=1)]
+		#Sort them based on start date
+		sorted_timed_events.sort(key=lambda event: event.start_date)
+		#Add events to the end if they are not multi-day
+		for event in timed_events:
+			if event not in sorted_timed_events:
+				sorted_timed_events.append(event)
+
 		#Puts all-day events before timed events
-		return list(chain(self.event_set.filter(all_day=True, approved=True).order_by('title'), self.event_set.exclude(all_day=True).exclude(approved=False).order_by('start_time')))
+		return list(chain(sorted_all_day_events, sorted_timed_events))
 
 	def save(self, *args, **kwargs):
 		self.day_of_week_str = day_dictionary[self.day_of_week]

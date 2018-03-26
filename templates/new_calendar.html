@@ -2,6 +2,10 @@
 
 {% load staticfiles %}
 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/spectrum.css' %}">
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
@@ -13,6 +17,7 @@
 	</form>
 </div>
 
+<script type="text/javascript" src="{% static 'js/spectrum.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/calendarform.js' %}"></script>
 
 {% endblock %}
