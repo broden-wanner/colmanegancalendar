@@ -30,7 +30,17 @@ def delete_unapproved_events_after_4_days():
 
 def calendarHomeView(request):
 	delete_unapproved_events_after_4_days()
-	return redirect('month', year=timezone.now().year, month=timezone.now().month)
+	if request.session.get('calendar_view', None):
+		if request.session['calendar_view'] == 'month':
+			return redirect('month', year=request.session['last_year_visited'], month=request.session['last_month_visited'])
+		elif request.session['calendar_view'] == 'week':
+			return redirect('week', year=request.session['last_year_visited'], month=request.session['last_month_visited'], first_day_of_week=request.session['last_first_day_of_week_visited'])
+		elif request.session['calendar_view'] == 'day':
+			return redirect('day', year=request.session['last_year_visited'], month=request.session['last_month_visited'], day=request.session['last_day_visited'])
+		else:
+			return redirect('month', year=timezone.now().year, month=timezone.now().month)
+	else:
+		return redirect('month', year=timezone.now().year, month=timezone.now().month)
 
 def calendarMonthView(request, year, month):
 	delete_unapproved_events_after_4_days()
@@ -91,6 +101,11 @@ def calendarMonthView(request, year, month):
 		first_day_of_week = calendar_rows[0][0]
 		day_view_day = first_day_of_week
 
+	#Adds data for session for home view
+	request.session['calendar_view'] = 'month'
+	request.session['last_month_visited'] = current_month.month
+	request.session['last_year_visited'] = current_year.year
+
 	return render(request, 'month.html', {
 		'type_of_view': 'Month',
 		'today': timezone.localtime(),
@@ -115,6 +130,12 @@ def calendarWeekView(request, year, month, first_day_of_week):
 	first_day_of_next_week = get_object_or_404(Day, pk=first_day.id+7)
 	first_day_of_last_week = get_object_or_404(Day, pk=first_day.id-7)
 
+	#Adds data for session for home view
+	request.session['calendar_view'] = 'week'
+	request.session['last_first_day_of_week_visited'] = first_day.day_of_month
+	request.session['last_month_visited'] = this_month.month
+	request.session['last_year_visited'] = this_year.year
+
 	return render(request, 'week.html', {
 		'type_of_view': 'Week',
 		'today': timezone.localtime(),
@@ -138,6 +159,13 @@ def calendarDayView(request, year, month, day):
 	next_day = get_object_or_404(Day, pk=this_day.pk+1)
 	previous_day = get_object_or_404(Day, pk=this_day.pk-1)
 	first_day_of_week = get_object_or_404(Day, day_of_week=0, pk__lte=this_day.pk, pk__gte=this_day.pk-6)
+
+	#Adds data for session for home view
+	request.session['calendar_view'] = 'day'
+	request.session['last_day_visited'] = this_day.day_of_month
+	request.session['last_month_visited'] = this_month.month
+	request.session['last_year_visited'] = this_year.year
+
 	return render(request, 'day.html', {
 		'type_of_view': 'Day',
 		'today': timezone.localtime(),
