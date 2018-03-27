@@ -20,8 +20,14 @@
 	overflow-y: auto;
 	overflow-x: hidden;
 	white-space: nowrap;
-	height: 80%;
+	height: 70%;
 	margin-top: 0.3em;
+}
+
+/* Remove scroll bar for calendar days */
+::-webkit-scrollbar {
+    width: 0px;  /* remove scrollbar space */
+    background: transparent;  /* optional: just make scrollbar invisible */
 }
 
 /* Gets rid of bullets in uls */
@@ -69,8 +75,8 @@
 }
 
 /* Creates today circle for day */
-.today-number, .today-number:hover {
-	background: black;
+a.today-number, a.today-number:hover {
+	background: #F5A719;
 	height: 1.5em;
 	width: 1.5em;
 	text-align: center;

@@ -13,6 +13,7 @@ from .tokens import account_activation_token
 from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
 from .forms import EventForm, CalendarForm, MemberCreationForm, MemberChangeForm, ReasonForEventEditForm, ReasonForEventRejectForm, ReasonForEventDeleteForm, ReasonForEventDeleteRejectForm
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 def event_conflicts(test_event, original_event=None):
 	test_event_start_datetime = datetime.datetime.combine(test_event.start_date, test_event.start_time)
@@ -37,6 +38,7 @@ def calendarEventView(request, year, month, day, pk, slug):
 	event = get_object_or_404(Event, pk=pk, slug=slug)
 	return render(request, 'event_view.html', {'event': event})
 
+@login_required
 def newEventView(request):
 	if request.method == 'POST':
 		new_event_form = EventForm(request.POST)
@@ -86,9 +88,11 @@ def newEventView(request):
 
 	return render(request, 'new_event.html', {'new_event_form': new_event_form})
 
+@login_required
 def event_approval_sent(request, slug, pk):
 	return render(request, 'approve/event_approval_sent.html')
 
+@login_required
 def approve_event(request, slug, pk):
 	event = get_object_or_404(Event, slug=slug, pk=pk)
 	if Group.objects.get(name='Admins') in request.user.groups.all():
@@ -114,6 +118,7 @@ def approve_event(request, slug, pk):
 	else:
 		return render(request, 'approve/event_approval_error.html')
 
+@login_required
 def reject_event(request, slug, pk):
 	if Group.objects.get(name='Admins') in request.user.groups.all():
 		if request.method == 'POST':
@@ -144,6 +149,7 @@ def reject_event(request, slug, pk):
 			return render(request, 'approve/reason_for_reject.html', {'reason_form': reason_form})
 	return render(request, 'approve/event_approval_error.html')
 
+@login_required
 def editEventView(request, year, month, day, pk, slug):
 	event = get_object_or_404(Event, pk=pk, slug=slug)
 	if request.method == 'POST':
@@ -229,6 +235,7 @@ def editEventView(request, year, month, day, pk, slug):
 			
 	return render(request, 'edit_event.html', {'event_form': event_form, 'reason_form': reason_form})
 
+@login_required
 def approve_event_change(request, original_slug, original_pk, changed_slug, changed_pk):
 	if Group.objects.get(name='Admins') in request.user.groups.all():
 		try:
@@ -254,6 +261,7 @@ def approve_event_change(request, original_slug, original_pk, changed_slug, chan
 	else:
 		return render(request, 'approve/event_approval_error.html')
 
+@login_required
 def reject_event_change(request, original_slug, original_pk, changed_slug, changed_pk):
 	if Group.objects.get(name='Admins') in request.user.groups.all():
 		if request.method == 'POST':
@@ -285,6 +293,7 @@ def reject_event_change(request, original_slug, original_pk, changed_slug, chang
 			return render(request, 'approve/reason_for_reject.html', {'reason_form': reason_form})
 	return render(request, 'approve/event_approval_error.html')
 
+@login_required
 def deleteEventView(request, year, month, day, pk, slug):
 	event = get_object_or_404(Event, pk=pk, slug=slug)
 	if request.method == 'POST':
@@ -321,9 +330,11 @@ def deleteEventView(request, year, month, day, pk, slug):
 			reason_form = ReasonForEventDeleteForm()
 	return render(request, 'delete_event.html', {'event': event, 'reason_form': reason_form})
 
+@login_required
 def event_deletion_request_sent(request, slug, pk):
 	return render(request, 'approve/event_deletion_request_sent.html')
 
+@login_required
 def approve_event_delete(request, slug, pk, deleting_user_pk):
 	if Group.objects.get(name='Admins') in request.user.groups.all():
 		if request.method == 'POST':
@@ -358,6 +369,7 @@ def approve_event_delete(request, slug, pk, deleting_user_pk):
 	else:
 		return render(request, 'approve/event_approval_error.html')
 
+@login_required
 def reject_event_delete(request, slug, pk, deleting_user_pk):
 	if Group.objects.get(name='Admins') in request.user.groups.all():
 		if request.method == 'POST':

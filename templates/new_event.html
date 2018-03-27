@@ -4,16 +4,50 @@
 
 {% block css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'css/eventform.css' %}">
 {% endblock %}
 
 {% block content %}
 
 <div class="container">
-	<h1>New Event</h1>
 	<form method="POST" enctype="multipart/form-data">
 		{% csrf_token %}
-		{{ new_event_form.as_p }}
-		<button type="submit" value="create_event">Create Event</button>
+		<div class="row">
+			<div class="col-sm-6">
+				<h1>New Event</h1>
+			</div>
+			<div class="col-sm-6">
+				<button type="submit" class="btn pull-right" value="create_event">Create Event</button>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				{% for field in new_event_form.visible_fields|slice:":4" %}
+					<div class="form-group">
+						{{ field.errors }}
+						{{ field.label_tag }} {{ field }}
+					</div>
+				{% endfor %}
+			</div>
+			<div class="col-sm-6">
+				{% for field in new_event_form.visible_fields|slice:"4:10" %}
+					<div class="form-group">
+						{{ field.errors }}
+						{{ field.label_tag }} {{ field }}
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 col-sm-offset-3">
+				{% for field in new_event_form.visible_fields|slice:"10:" %}
+					<div class="form-group">
+						{{ field.errors }}
+						{{ field.label_tag }} {{ field }}
+					</div>
+				{% endfor %}
+			</div>
+		</div>
 	</form>
 	<br>
 	<p>Calendar not showing up? <a href="{% url 'new_calendar' %}">Create a new one.</a></p>
@@ -23,7 +57,7 @@
 <script type="text/javascript">alert("Address the following error messages")</script>
 {% endif %}
 
-<script type="text/javascript" src="{% static 'js/eventform.js' %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+<script type="text/javascript" src="{% static 'js/eventform.js' %}"></script>
 
 {% endblock %}

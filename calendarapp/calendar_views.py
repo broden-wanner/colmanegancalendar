@@ -82,17 +82,19 @@ def calendarMonthView(request, year, month):
 		calendar_rows.append(week_row)
 
 	if timezone.localtime().month == current_month.month:
+		day_view_day = get_object_or_404(Day, month=Month.objects.get(year=Year.objects.get(year=timezone.localtime().year), month=timezone.localtime().month), day_of_month=timezone.localtime().day)
 		first_day_of_week = timezone.localtime()
 		while first_day_of_week.weekday() != 6:
 			first_day_of_week -= datetime.timedelta(days=1)
 		first_day_of_week = get_object_or_404(Day, month=Month.objects.get(year=Year.objects.get(year=first_day_of_week.year), month=first_day_of_week.month), day_of_month=first_day_of_week.day)
 	else:
 		first_day_of_week = calendar_rows[0][0]
+		day_view_day = first_day_of_week
 
 	return render(request, 'month.html', {
 		'type_of_view': 'Month',
 		'today': timezone.localtime(),
-		'day_view_day': first_day_of_week,
+		'day_view_day': day_view_day,
 		'month_weeks': calendar_rows,
 		'current_month': current_month,
 		'next_month': next_month,
@@ -115,6 +117,7 @@ def calendarWeekView(request, year, month, first_day_of_week):
 
 	return render(request, 'week.html', {
 		'type_of_view': 'Week',
+		'today': timezone.localtime(),
 		'week': week,
 		'day_view_day': week[0],
 		'first_day_of_week': week[0],
@@ -137,6 +140,7 @@ def calendarDayView(request, year, month, day):
 	first_day_of_week = get_object_or_404(Day, day_of_week=0, pk__lte=this_day.pk, pk__gte=this_day.pk-6)
 	return render(request, 'day.html', {
 		'type_of_view': 'Day',
+		'today': timezone.localtime(),
 		'day': this_day,
 		'day_view_day': this_day,
 		'next_day': next_day,

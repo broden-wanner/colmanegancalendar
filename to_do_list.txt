@@ -9,8 +9,7 @@
 	-Allow admins to see all pending events and approve them from the page
 	-Pass in a form with check boxes to delete the checked ones
 
-Host it, eventually.
-Continue styling...
+Save calendar preferences with ajax if logged, else use sessions
 
 4. have ability to change between month, week, and day views without reloading
 5. maybe delete and edit events without reloading page

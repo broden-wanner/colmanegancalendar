@@ -1,0 +1,8 @@
+/* Gets rid of bullets in front of days to repeat on */
+ul {
+	list-style: none;
+}
+
+button[type="submit"] {
+	margin-top: 1.5em;
+}

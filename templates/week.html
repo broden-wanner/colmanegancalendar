@@ -15,7 +15,7 @@
 		<table class="table table-bordered" id="week-table">
 			<tr>
 				{% for day in week %}
-					<th><a href="{% url 'day' year=day.month.year.year month=day.month.month day=day.day_of_month %}">
+					<th {% if day.month.year.year == today.year and day.month.month == today.month and day.day_of_month == today.day %}class="today-number"{% endif %}><a href="{% url 'day' year=day.month.year.year month=day.month.month day=day.day_of_month %}">
 						<div class="day-of-week">{{ day.day_of_week_str|slice:"3" }}</div>
 						<div class="day-of-month">{{ day.day_of_month }}</div>
 					</a></th>

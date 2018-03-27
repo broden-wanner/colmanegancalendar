@@ -1,0 +1,47 @@
+/* Set font-size of the days of the month numbers */
+div.day-of-month {
+	font-size: 3em;
+}
+
+/* Sets the day header to a certain color */
+#day-header {
+	color: #9d9d9d;
+}
+
+/* Gets rid of padding around the table*/
+#day-table-container {
+	padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Sets width of columns */
+.time-column {
+	width: 30%;
+}
+.title-column {
+	width: 20%;
+}
+.event-info-column {
+	width: 50%;
+}
+
+/* Sets height of rows */
+.time-column, .title-column, .event-info-column {
+	height: 5%;
+}
+
+/* Makes the text of the event data white */
+tr[data-calendar-pk] td {
+	color: white;
+}
+
+/* Sets hover settings for event rows */
+#day-table tr[data-calendar-pk]:hover {
+	cursor: pointer;
+	background-color: #9d9d9d !important;
+}
+
+/* Creates today highlight for today */
+.today-number div, .today-number:hover div {
+	color: #F5A719;
+} 

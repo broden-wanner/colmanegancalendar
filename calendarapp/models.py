@@ -85,7 +85,7 @@ class Day(models.Model):
 
 		timed_events = list(self.event_set.filter(all_day=False, approved=True).order_by('start_time'))
 		#Get events that last more than one day
-		sorted_timed_events = [event for event in timed_events if event.end_date - event.start_date > datetime.timedelta(days=1)]
+		sorted_timed_events = [event for event in timed_events if (event.end_date - event.start_date) > datetime.timedelta(days=1)]
 		#Sort them based on start date
 		sorted_timed_events.sort(key=lambda event: event.start_date)
 		#Add events to the end if they are not multi-day

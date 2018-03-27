@@ -2,7 +2,7 @@ var showHideDuration = 200;
 
 //Adds date and time pickers to forms
 $(function() {
-	$('input[name="start_date"], input[name="end_date"]').datepicker();
+	$('input[name="start_date"], input[name="end_date"], input[name="ends_on"]').datepicker();
 	$('input[name="start_time"], input[name="end_time"]').timepicker({
 		timeFormat: 'hh:mm p',
 		interval: 15

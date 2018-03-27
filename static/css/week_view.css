@@ -67,3 +67,7 @@ div.day-of-month {
 	color: #9d9d9d;
 }
 
+/* Creates today highlight for today */
+.today-number div, .today-number:hover div {
+	color: #F5A719;
+} 

@@ -5,33 +5,41 @@ from django.forms import ValidationError
 from .models import Event, Calendar, DayOfWeek, Location
 
 class EventForm(forms.ModelForm):
+	title = forms.CharField(
+		widget=forms.TextInput(attrs={'class': 'form-control'})
+	)
+	event_info = forms.CharField(
+		widget=forms.Textarea(attrs={'class': 'form-control'})
+	)
 	calendar = forms.ModelChoiceField(
-		queryset=Calendar.objects.all().order_by('event_calendar')
+		queryset=Calendar.objects.all().order_by('event_calendar'),
+		widget=forms.Select(attrs={'class': 'form-control'})
 	)
 	location = forms.ModelChoiceField(
 		queryset=Location.objects.all().order_by('location'),
-		required=False
+		required=False,
+		widget=forms.Select(attrs={'class': 'form-control'})
 	)
 	start_date = forms.DateField(
 		input_formats=['%m/%d/%Y'],
-		widget=forms.DateInput(format='%m/%d/%Y')
+		widget=forms.DateInput(format='%m/%d/%Y', attrs={'class': 'form-control'})
 	)
 	start_time = forms.TimeField(
 		input_formats=['%I:%M %p'],
-		widget=forms.TimeInput(format='%I:%M %p')
+		widget=forms.TimeInput(format='%I:%M %p', attrs={'class': 'form-control'})
 	)
 	end_date = forms.DateField(
 		input_formats=['%m/%d/%Y'],
-		widget=forms.DateInput(format='%m/%d/%Y')
+		widget=forms.DateInput(format='%m/%d/%Y', attrs={'class': 'form-control'})
 	)
 	end_time = forms.TimeField(
 		input_formats=['%I:%M %p'],
-		widget=forms.TimeInput(format='%I:%M %p')
+		widget=forms.TimeInput(format='%I:%M %p', attrs={'class': 'form-control'})
 	)
 	#Handles data for the recurring aspect of the event
 	repeat = forms.BooleanField(required=False)
 	repeat_every = forms.IntegerField(
-		widget=forms.NumberInput(attrs={'type': 'number', 'min': 1}),
+		widget=forms.NumberInput(attrs={'type': 'number', 'min': 1, 'class': 'form-control'}),
 		required=False
 	)
 	repeat_on = forms.ModelMultipleChoiceField(
@@ -40,12 +48,11 @@ class EventForm(forms.ModelForm):
 		required=False
 	)
 	ends_on = forms.DateField(
-		input_formats=['%Y-%m-%d'],
-		widget=forms.DateInput(attrs={'type': 'date'}),
-		required=False
+		input_formats=['%m/%d/%Y'],
+		widget=forms.DateInput(format='%m/%d/%Y', attrs={'class': 'form-control'}),
 	)
 	ends_after = forms.IntegerField(
-		widget=forms.NumberInput(attrs={'type': 'number', 'min': 1}),
+		widget=forms.NumberInput(attrs={'type': 'number', 'min': 1, 'class': 'form-control'}),
 		required=False,
 		help_text='occurences'
 	)
@@ -69,6 +76,9 @@ class EventForm(forms.ModelForm):
 			'ends_on',
 			'ends_after'
 		)
+		widgets = {
+			'duration': forms.Select(attrs={'class': 'form-control'}),
+		}
 
 	def clean(self):
 		cleaned_data = super().clean()

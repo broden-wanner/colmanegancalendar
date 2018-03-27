@@ -38,6 +38,7 @@
 	//Hide events based on user preferences and default calendars
 	{% for calendar in hidden_calendars %}
 		$('li[data-calendar-pk="{{ calendar.pk }}"]').hide();
+		$('tr[data-calendar-pk="{{ calendar.pk }}"]').hide();
 		$('input[name="filter-calendar"][value="{{ calendar.pk }}"]').next().css("background-color", "#eee");
 	{% endfor %}
 
@@ -71,10 +72,12 @@
 		if(calendars_to_show.length) {
 			for(var i = 0; i < calendars_to_show.length; i++) {
 				$('li[data-calendar-pk="' + calendars_to_show[i] + '"]').show();
+				$('tr[data-calendar-pk="' + calendars_to_show[i] + '"]').show();
 			}
 		} else {
 			//Hide all calendars if there are none to show
 			$('li[data-calendar-pk]').hide();
+			$('tr[data-calendar-pk]').hide();
 		}
 
 		var calendars_to_hide = [];
@@ -86,10 +89,12 @@
 		if(calendars_to_hide.length) {
 			for(var i = 0; i < calendars_to_hide.length; i++) {
 				$('li[data-calendar-pk="' + calendars_to_hide[i] + '"]').hide();
+				$('tr[data-calendar-pk="' + calendars_to_hide[i] + '"]').hide();
 			}
 		} else {
 			//Show all calendars if there are none to hide
 			$('li[data-calendar-pk]').show();
+			$('tr[data-calendar-pk]').show();
 		}
 	});
 </script>
