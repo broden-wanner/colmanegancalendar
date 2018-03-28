@@ -54,6 +54,11 @@ def activate(request, uidb64, token):
 	except (TypeError, ValueError, OverflowError, User.DoesNotExist):
 		user = None
 
+	#If the user is already active, log them in and redirect to home
+	if user.is_active:
+		login(request, user)
+		return redirect('home')
+
 	if user is not None and account_activation_token.check_token(user, token):
 		user.is_active = True
 		user.member.email_confirmed = True
@@ -61,6 +66,7 @@ def activate(request, uidb64, token):
 		login(request, user)
 		return redirect('home')
 	else:
+		print(f'There was an error when {user} tried to activate')
 		return render(request, 'registration/account_activation_invalid.html')
 
 def edit_member_info(request, username):

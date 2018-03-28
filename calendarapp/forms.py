@@ -9,7 +9,8 @@ class EventForm(forms.ModelForm):
 		widget=forms.TextInput(attrs={'class': 'form-control'})
 	)
 	event_info = forms.CharField(
-		widget=forms.Textarea(attrs={'class': 'form-control'})
+		widget=forms.Textarea(attrs={'class': 'form-control'}),
+		required=False
 	)
 	calendar = forms.ModelChoiceField(
 		queryset=Calendar.objects.all().order_by('event_calendar'),
