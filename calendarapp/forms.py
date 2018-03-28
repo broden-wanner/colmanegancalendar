@@ -16,7 +16,7 @@ class EventForm(forms.ModelForm):
 		widget=forms.Select(attrs={'class': 'form-control'})
 	)
 	location = forms.ModelChoiceField(
-		queryset=Location.objects.all().order_by('location'),
+		queryset=Location.objects.filter(approved=True).order_by('location'),
 		required=False,
 		widget=forms.Select(attrs={'class': 'form-control'})
 	)
@@ -92,40 +92,67 @@ class EventForm(forms.ModelForm):
 
 class ReasonForEventEditForm(forms.Form):
 	reason = forms.CharField(
-		required=True,
-		label='Reason for editing the event:'
+		required=False,
+		label='Reason for editing the event:',
+		widget=forms.TextInput(attrs={'class': 'form-control'})
 	)
 
 class ReasonForEventRejectForm(forms.Form):
 	reason = forms.CharField(
-		required=True,
-		label='Reason for rejecting the event:'
+		required=False,
+		label='Reason for rejecting the event:',
+		widget=forms.TextInput(attrs={'class': 'form-control'})
 	)
 
 class ReasonForEventDeleteForm(forms.Form):
 	reason = forms.CharField(
-		required=True,
-		label='Reason for deleting the event:'
+		required=False,
+		label='Reason for deleting the event:',
+		widget=forms.TextInput(attrs={'class': 'form-control'})
 	)
 
 class ReasonForEventDeleteRejectForm(forms.Form):
 	reason = forms.CharField(
-		required=True,
-		label='Reason for not deleting the event:'
+		required=False,
+		label='Reason for not deleting the event:',
+		widget=forms.TextInput(attrs={'class': 'form-control'})
 	)
+
+class ReasonForCalendarRejectForm(forms.Form):
+	reason = forms.CharField(
+		required=False,
+		label='Reason for rejecting the calendar:',
+		widget=forms.TextInput(attrs={'class': 'form-control'})
+	)
+
+class ReasonForLocationRejectForm(forms.Form):
+	reason = forms.CharField(
+		required=False,
+		label='Reason for rejecting the location:',
+		widget=forms.TextInput(attrs={'class': 'form-control'})
+	)	
 
 class CalendarForm(forms.ModelForm):
 
 	class Meta:
 		model = Calendar
 		fields = ('event_calendar', 'color', 'default_calendar')
+		labels = {'event_calendar': 'Name:'}
+
+class LocationForm(forms.ModelForm):
+
+	class Meta:
+		model = Location
+		fields = ('location',)
+		widgets = {'location': forms.TextInput(attrs={'class': 'form-control'})}
+		labels = {'location': 'Location name:'}
 
 class MemberCreationForm(UserCreationForm):
 	first_name = forms.CharField(max_length=30)
 	last_name = forms.CharField(max_length=30)
 	email = forms.EmailField(max_length=254, help_text='Required. Input a valid email address.', required=True)
 	calendar_preferences = forms.ModelMultipleChoiceField(
-		queryset=Calendar.objects.all().order_by('event_calendar'),
+		queryset=Calendar.objects.filter(approved=True).order_by('event_calendar'),
 		widget=forms.CheckboxSelectMultiple(),
 		required=False
 	)
@@ -152,7 +179,7 @@ class MemberCreationForm(UserCreationForm):
 class MemberChangeForm(forms.ModelForm):
 	username = forms.CharField()
 	calendar_preferences = forms.ModelMultipleChoiceField(
-		queryset=Calendar.objects.all().order_by('event_calendar'),
+		queryset=Calendar.objects.filter(approved=True).order_by('event_calendar'),
 		widget=forms.CheckboxSelectMultiple(),
 		required=False
 	)

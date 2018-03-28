@@ -2,11 +2,17 @@
 
 {% block content %}
 <div class="container">
-	<h1>Tell the user why their event was deleted...</h1>
-	<form method="POST" enctype="multipart/form-data">
-		{% csrf_token %}
-		{{ reason_form.as_p }}
-		<button type="submit" value="reject_event">Delete Event</button>
-	</form>
+	<br>
+	<h4>Tell the user why their event was deleted...</h4>
+	<br>
+	<div class="row">
+		<div class="col-sm-6">
+			<form method="POST" enctype="multipart/form-data">
+				{% csrf_token %}
+				{{ reason_form.as_p }}
+				<button class="btn" type="submit" value="reject_event">Delete Event</button>
+			</form>
+		</div>
+	</div>
 </div>
 {% endblock %}

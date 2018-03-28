@@ -73,7 +73,7 @@ class Day(models.Model):
 		return '%i of %s %i' % (self.day_of_month, self.month.month_str, int(self.month.year.year))
 
 	def sorted_events(self):
-		all_day_events = list(self.event_set.filter(all_day=True, approved=True))
+		all_day_events = list(self.event_set.filter(all_day=True, approved=True).exclude(calendar__approved=False))
 		#Get events that last more than one day
 		sorted_all_day_events = [event for event in all_day_events if event.end_date - event.start_date > datetime.timedelta(days=1)]
 		#Sort them based on start date
@@ -83,7 +83,7 @@ class Day(models.Model):
 			if event not in sorted_all_day_events:
 				sorted_all_day_events.append(event)
 
-		timed_events = list(self.event_set.filter(all_day=False, approved=True).order_by('start_time'))
+		timed_events = list(self.event_set.filter(all_day=False, approved=True).exclude(calendar__approved=False).order_by('start_time'))
 		#Get events that last more than one day
 		sorted_timed_events = [event for event in timed_events if (event.end_date - event.start_date) > datetime.timedelta(days=1)]
 		#Sort them based on start date
@@ -102,7 +102,9 @@ class Day(models.Model):
 
 class Calendar(models.Model):
 	event_calendar = models.CharField(max_length=100, unique=True)
+	creator = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
 	default_calendar = models.BooleanField(default=False)
+	approved = models.BooleanField(default=False)
 	color = models.CharField(max_length=50, unique=True, null=True)
 	slug = models.SlugField(unique=True, blank=True, null=True)
 
@@ -110,19 +112,21 @@ class Calendar(models.Model):
 		return f'{self.event_calendar} Calendar'
 
 	def save(self, *args, **kwargs):
-		self.event_calendar = self.event_calendar.title()
+		self.event_calendar = self.event_calendar.capitalize()
 		self.slug = slugify(self.event_calendar)
 		super(Calendar, self).save(*args, **kwargs)
 
 class Location(models.Model):
 	location = models.CharField(max_length=1000, unique=True)
+	creator = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
 	slug = models.SlugField(unique=True, blank=True)
+	approved = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.location
 
 	def save(self, *args, **kwargs):
-		self.location = self.location.title()
+		self.location = self.location.capitalize()
 		self.slug = slugify(self.location)
 		super(Location, self).save(*args, **kwargs)
 
@@ -303,7 +307,7 @@ class Event(models.Model):
 				raise ValidationError({'ends_on': 'Must be later than the start date'})
 
 	def save(self, *args, **kwargs):
-		self.title = self.title.title()
+		self.title = self.title.capitalize()
 		self.slug = slugify(self.title)
 		self.full_clean()
 		super(Event, self).save(*args, **kwargs)

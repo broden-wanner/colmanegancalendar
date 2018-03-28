@@ -1,0 +1,14 @@
+{% autoescape off %}
+{{ user.username }} wants to create the following calendar:
+
+{% include 'email/calendar_snippet_raw_text.txt' %}
+
+Click the link below to approve the calendar as is:
+http://{{ domain }}{% url 'approve_calendar' slug=calendar.slug %}
+
+If you want to make changes to the calendar before its creation, click the link below:
+http://{{ domain }}{% url 'edit_calendar' slug=calendar.slug %}
+
+Click the link below to reject the calendar:
+http://{{ domain }}{% url 'reject_calendar' slug=calendar.slug %}
+{% endautoescape %}

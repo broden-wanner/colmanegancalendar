@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="container">
-	<h1>Delete Event</h1>
+	<h1>Delete Calendar</h1>
 	<form method="POST">
 		{% csrf_token %}
 		<p>Are you sure you want to delete the {{ calendar.event_calendar }} calendar? It will remove all events associated with the calendar.</p>

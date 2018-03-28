@@ -128,9 +128,11 @@ def reject_event(request, slug, pk):
 					event = Event.objects.get(slug=slug, pk=pk)
 				except Event.DoesNotExist:
 					return render(request, 'approve/event_already_rejected.html')
+				#Don't delete if it is already approved
+				if event.approved:
+					return render(request, 'approve/event_already_approved.html')
 				#Send an email to the user if their email is confirmed to tell them about the event
 				reason = reason_form.cleaned_data.get('reason')
-				current_site = get_current_site(request)
 				subject = f'Event Rejected: {event.title} on {event.start_date}'
 				content = {
 					'user': event.creator,

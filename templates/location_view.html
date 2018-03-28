@@ -5,11 +5,22 @@
 <div class="container">
 	<h1>Location: {{ location.location }}</h1>
 	<p>Events happening in this location:</p>
-	<ul>
-		{% for event in events %}
-			<li><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}" style="color: {{ event.calendar.color }};">{{ event.start_date|date:'n/j/y' }} {{ event.start_time|date:'f a' }} {{ event.title }}</a></li>
-		{% endfor %}
-	</ul>
+	{% if events %}
+		<ul>
+			{% for event in events %}
+				<li><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}" style="color: {{ event.calendar.color }};">{{ event.start_date|date:'n/j/y' }} {{ event.start_time|date:'f a' }} {{ event.title }}</a></li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<p>None</p>
+	{% endif %}
+
+	{% if perms.calendarapp.change_location %}
+		<p><a href="{% url 'edit_location' slug=location.slug %}">Edit Location</a></p>
+	{% endif %}
+	{% if perms.calendarapp.delete_location %}
+		<p><a href="{% url 'delete_location' slug=location.slug %}">Delete Location</a></p>
+	{% endif %}
 </div>
 
 {% endblock %}

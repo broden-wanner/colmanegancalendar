@@ -9,7 +9,6 @@ class EventAdmin(admin.ModelAdmin):
 
 class CalendarAdmin(admin.ModelAdmin):
 	exclude = ('slug',)
-	form = CalendarForm
 
 class LocationAdmin(admin.ModelAdmin):
 	exclude = ('slug',)

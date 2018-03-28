@@ -1,0 +1,5 @@
+Calendar Title: {{ calendar.event_calendar }}
+
+Color: {{ calendar.color }} (If you want to see the color, search "Hex Color Values" and input the code into one of the websites)
+
+Default Calendar: {{ calendar.default_calendar|yesno:'Yes, No' }}

@@ -1,0 +1,14 @@
+{% autoescape off %}
+{{ user.username }} wants to create the following location:
+
+Location Name: {{ location.location }}
+
+Click the link below to approve the location as is:
+http://{{ domain }}{% url 'approve_location' slug=location.slug %}
+
+If you want to make changes to the location before its creation, click the link below:
+http://{{ domain }}{% url 'edit_location' slug=location.slug %}
+
+Click the link below to reject the location:
+http://{{ domain }}{% url 'reject_location' slug=location.slug %}
+{% endautoescape %}

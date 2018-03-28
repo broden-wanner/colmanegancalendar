@@ -1,0 +1,9 @@
+<p>{{ user.username }} wants to create the following location:</p>
+
+<p>Location Name: {{ location.location }}</p>
+
+<p><a href="http://{{ domain }}{% url 'approve_location' slug=location.slug %}">Click here to approve the location as is.</a></p>
+
+<p><a href="http://{{ domain }}{% url 'edit_location' slug=location.slug %}">If you want to make changes to the location before its creation, click here.</a></p>
+
+<p><a href="http://{{ domain }}{% url 'reject_location' slug=location.slug %}">Click here to reject the location.</a></p>

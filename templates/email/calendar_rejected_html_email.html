@@ -1,0 +1,7 @@
+<p>Hi, {{ calendar.creator.username }}. The following calendar has been rejected because of the following reason.</p>
+
+<p>Reason:</p>
+<p>{{ reason }}</p>
+
+<p>Calendar:<p>
+{% include 'email/calendar_snippet_html.txt' %}

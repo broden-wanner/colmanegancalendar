@@ -9,14 +9,14 @@ def return_calendars(request, option):
 	if request.user.is_authenticated:
 		shown_calendars = request.user.member.calendar_preferences.all()
 		shown_calendar_pks = [calendar.pk for calendar in shown_calendars]
-		hidden_calendars = Calendar.objects.exclude(pk__in=shown_calendar_pks)
+		hidden_calendars = Calendar.objects.exclude(pk__in=shown_calendar_pks).exclude(approved=False)
 		#If user has no preferences, display default calendars
 		if not shown_calendars:
-			hidden_calendars = Calendar.objects.exclude(default_calendar=True)
-			shown_calendars = Calendar.objects.filter(default_calendar=True)
+			hidden_calendars = Calendar.objects.exclude(default_calendar=True).exclude(approved=False)
+			shown_calendars = Calendar.objects.filter(default_calendar=True).exclude(approved=False)
 	else:
-		hidden_calendars = Calendar.objects.exclude(default_calendar=True)
-		shown_calendars = Calendar.objects.filter(default_calendar=True)
+		hidden_calendars = Calendar.objects.exclude(default_calendar=True).exclude(approved=False)
+		shown_calendars = Calendar.objects.filter(default_calendar=True).exclude(approved=False)
 
 	if option == 'shown_calendars':
 		return shown_calendars
@@ -114,8 +114,8 @@ def calendarMonthView(request, year, month):
 		'current_month': current_month,
 		'next_month': next_month,
 		'previous_month': previous_month,
-		'calendars': Calendar.objects.all().order_by('event_calendar'),
-		'locations': Location.objects.all().order_by('location'),
+		'calendars': Calendar.objects.filter(approved=True).order_by('event_calendar'),
+		'locations': Location.objects.filter(approved=True).order_by('location'),
 		'first_day_of_week': first_day_of_week,
 		'shown_calendars': return_calendars(request, 'shown_calendars'),
 		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
@@ -145,10 +145,10 @@ def calendarWeekView(request, year, month, first_day_of_week):
 		'first_day_of_next_week': first_day_of_next_week,
 		'first_day_of_last_week': first_day_of_last_week,
 		'current_month': this_month,
-		'calendars': Calendar.objects.all().order_by('event_calendar'),
+		'calendars': Calendar.objects.filter(approved=True).order_by('event_calendar'),
 		'shown_calendars': return_calendars(request, 'shown_calendars'),
 		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
-		'locations': Location.objects.all().order_by('location'),
+		'locations': Location.objects.filter(approved=True).order_by('location'),
 	})
 
 def calendarDayView(request, year, month, day):
@@ -175,8 +175,8 @@ def calendarDayView(request, year, month, day):
 		'previous_day': previous_day,
 		'first_day_of_week': first_day_of_week,
 		'current_month': this_month,
-		'calendars': Calendar.objects.all().order_by('event_calendar'),
+		'calendars': Calendar.objects.filter(approved=True).order_by('event_calendar'),
 		'shown_calendars': return_calendars(request, 'shown_calendars'),
 		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
-		'locations': Location.objects.all().order_by('location'),
+		'locations': Location.objects.filter(approved=True).order_by('location'),
 	})

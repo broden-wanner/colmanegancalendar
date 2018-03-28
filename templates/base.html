@@ -72,6 +72,9 @@
 						        {% if perms.calendarapp.add_calendar %}
 						        	<li><a href="{% url 'new_calendar' %}">Calendar</a></li>
 						        {% endif %}
+						        {% if perms.calendarapp.add_location %}
+						        	<li><a href="{% url 'new_location' %}">Location</a></li>
+						       	{% endif %}
 					        </ul>
 					     </li>
 					{% endif %}
@@ -90,7 +93,7 @@
 				{# Displays the login/signup/logout links when appropriate #}
 		  		{% if request.path != '/accounts/login/' or request.path != '/accounts/signup/' %}
 					{% if user.is_authenticated %}
-						<li><p class="navbar-text"><span class="glyphicon glyphicon-user"></span> <a href="{% url 'member_view' username=user.username %}"> Hi, {{ user.username }}!</a></p></li>
+						<li><p class="navbar-text"><a href="{% url 'member_view' username=user.username %}"><span class="glyphicon glyphicon-user"></span> Hi, {{ user.username }}!</a></p></li>
 						<li><a href="{% url 'logout' %}?next={{request.path}}"> <span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
 					{% else %}
 						<li><a href="{% url 'login' %}?next={{ request.path }}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>

@@ -35,11 +35,20 @@ urlpatterns += [
 	path('calendar/<slug:slug>/', event_calendar_views.calendarView, name='calendar_view'),
 	path('calendar/<slug:slug>/edit/', event_calendar_views.editCalendarView, name='edit_calendar'),
 	path('calendar/<slug:slug>/delete/', event_calendar_views.deleteCalendarView, name='delete_calendar'),
+	path('calendar/approval-sent/<slug:slug>/', event_calendar_views.calendar_approval_sent, name='calendar_approval_sent'),
+	path('calendar/approve-calendar/<slug:slug>/', event_calendar_views.approve_calendar, name='approve_calendar'),
+	path('calendar/reject-calendar/<slug:slug>/', event_calendar_views.reject_calendar, name='reject_calendar')
 ]
 
 #Location Views
 urlpatterns += [
-	path('location/<slug:slug>/', location_views.locationView, name='location_view'),
+	path('location/new/', location_views.new_location, name='new_location'),
+	path('location/<slug:slug>/', location_views.location_view, name='location_view'),
+	path('location/<slug:slug>/edit/', location_views.edit_location, name='edit_location'),
+	path('location/<slug:slug>/delete/', location_views.delete_location, name='delete_location'),
+	path('location/approval-sent/<slug:slug>/', location_views.location_approval_sent, name='location_approval_sent'),
+	path('location/approve-location/<slug:slug>/', location_views.approve_location, name='approve_location'),
+	path('location/reject-location/<slug:slug>/', location_views.reject_location, name='reject_location'),
 ]
 
 #Account Views

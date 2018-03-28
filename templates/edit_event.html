@@ -48,6 +48,16 @@
 				{% endfor %}
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-sm-6 col-sm-offset-3">
+				{% for field in reason_form.visible_fields %}
+					<div class="form-group">
+						{{ field.errors }}
+						{{ field.label_tag }} {{ field }}
+					</div>
+				{% endfor %}
+			</div>
+		</div>
 	</form>
 	<br>
 	<p>Calendar not showing up? <a href="{% url 'new_calendar' %}">Create a new one.</a></p>
