@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 
 def calendarView(request, slug):
 	calendar = get_object_or_404(Calendar, slug=slug)
-	events = Event.objects.filter(calendar=calendar, end_date__gte=timezone.localtime().date()).order_by('start_date', 'start_time')
+	events = Event.objects.filter(approved=True, calendar=calendar, end_date__gte=timezone.localtime().date()).order_by('start_date', 'start_time')
 	return render(request, 'calendar_view.html', {'calendar': calendar, 'events': events})
 
 @login_required
