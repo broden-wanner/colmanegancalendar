@@ -51,7 +51,7 @@ def newEventView(request):
 			new_event_form.save_m2m()
 			new_event.set_days_of_event()
 			if Group.objects.get(name='Admins') in request.user.groups.all():
-				return redirect('month', year=new_event.start_date.year, month=new_event.start_date.month)
+				return redirect('home')
 			else:
 				#Send email to admins if event created by non-admin
 				current_site = get_current_site(request)
@@ -112,7 +112,7 @@ def approve_event(request, slug, pk):
 			msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, [event.creator.email])
 			msg.attach_alternative(html_message, 'text/html')
 			msg.send()
-			return redirect('month', year=event.start_date.year, month=event.start_date.month)
+			return redirect('home')
 		#If already approved, don't send email and tell user that it is already approved
 		else:
 			return render(request, 'approve/event_already_approved.html')
@@ -146,7 +146,7 @@ def reject_event(request, slug, pk):
 				msg.attach_alternative(html_message, 'text/html')
 				msg.send()
 				event.delete()
-				return redirect('month', year=event.start_date.year, month=event.start_date.month)
+				return redirect('home')
 		else:
 			reason_form = ReasonForEventRejectForm()
 			return render(request, 'approve/reason_for_reject.html', {'reason_form': reason_form})
@@ -179,7 +179,7 @@ def editEventView(request, year, month, day, pk, slug):
 					original_event.save()
 				changed_event.save()
 				if Group.objects.get(name='Admins') in request.user.groups.all():
-					return redirect('month', year=changed_event.start_date.year, month=changed_event.start_date.month)
+					return redirect('home')
 				else:
 					#Send email to admins if event edited by non-admin
 					current_site = get_current_site(request)
@@ -261,7 +261,7 @@ def approve_event_change(request, original_slug, original_pk, changed_slug, chan
 		msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, recipients)
 		msg.attach_alternative(html_message, 'text/html')
 		msg.send()
-		return redirect('month', year=changed_event.start_date.year, month=changed_event.start_date.month)
+		return redirect('home')
 	else:
 		return render(request, 'approve/event_approval_error.html')
 
@@ -291,7 +291,7 @@ def reject_event_change(request, original_slug, original_pk, changed_slug, chang
 				msg.attach_alternative(html_message, 'text/html')
 				msg.send()
 				changed_event.delete()
-				return redirect('month', year=original_event.start_date.year, month=original_event.start_date.month)
+				return redirect('home')
 		else:
 			reason_form = ReasonForEventRejectForm()
 			return render(request, 'approve/reason_for_reject.html', {'reason_form': reason_form})
@@ -303,7 +303,7 @@ def deleteEventView(request, year, month, day, pk, slug):
 	if request.method == 'POST':
 		if Group.objects.get(name='Admins') in request.user.groups.all():
 			event.delete()
-			return redirect('month', year=timezone.now().year, month=timezone.now().month)
+			return redirect('home')
 		else:
 			reason_form = ReasonForEventDeleteForm(request.POST)
 			if reason_form.is_valid():
@@ -366,7 +366,7 @@ def approve_event_delete(request, slug, pk, deleting_user_pk):
 				msg.attach_alternative(html_message, 'text/html')
 				msg.send()
 				event.delete()
-				return redirect('month', year=event.start_date.year, month=event.start_date.month)
+				return redirect('home')
 		else:
 			reason_form = ReasonForEventDeleteForm()
 			return render(request, 'approve/reason_for_delete.html', {'reason_form': reason_form})
@@ -396,7 +396,7 @@ def reject_event_delete(request, slug, pk, deleting_user_pk):
 				msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, [deleting_user.email])
 				msg.attach_alternative(html_message, 'text/html')
 				msg.send()
-				return redirect('month', year=event.start_date.year, month=event.start_date.month)
+				return redirect('home')
 		else:
 			reason_form = ReasonForEventDeleteRejectForm()
 			return render(request, 'approve/reason_for_reject.html', {'reason_form': reason_form})
