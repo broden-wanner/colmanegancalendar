@@ -18,11 +18,11 @@
 		{% if user.member.calendar_preferences.all %}
 			<ul>
 				{% for calendar in user.member.calendar_preferences.all %}
-					<li>{{ calendar.event_calendar }} <span class="bullet" style="background-color: {{ calendar.color }};"></span></li>
+					<li><a href="{% url 'calendar_view' slug=calendar.slug %}">{{ calendar.event_calendar }}</a> <span class="bullet" style="background-color: {{ calendar.color }};"></span></li>
 				{% endfor %}
 			</ul>
 		{% else %}
-			<p>&emsp;You have no calendar preferences</p>
+			<p>You have no calendar preferences</p>
 		{% endif %}
 		<div class="row" id="user-buttons">
 			<div class="col-sm-6">
