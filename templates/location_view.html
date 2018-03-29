@@ -18,7 +18,7 @@
 		</tr>
 		{% else %}
 			{% for event in events %}
-				<tr data-calendar-pk="{{ event.calendar.pk }}">
+				<tr data-calendar-pk="{{ event.calendar.pk }}" style="background-color: {{ event.calendar.color }}">
 					<td class="title-column">
 						{{ event.title }}
 					</td>
