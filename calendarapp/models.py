@@ -112,7 +112,6 @@ class Calendar(models.Model):
 		return f'{self.event_calendar} Calendar'
 
 	def save(self, *args, **kwargs):
-		self.event_calendar = self.event_calendar.capitalize()
 		self.slug = slugify(self.event_calendar)
 		super(Calendar, self).save(*args, **kwargs)
 
@@ -126,7 +125,6 @@ class Location(models.Model):
 		return self.location
 
 	def save(self, *args, **kwargs):
-		self.location = self.location.capitalize()
 		self.slug = slugify(self.location)
 		super(Location, self).save(*args, **kwargs)
 
@@ -308,7 +306,6 @@ class Event(models.Model):
 				raise ValidationError({'ends_on': 'Must be later than the start date'})
 
 	def save(self, *args, **kwargs):
-		self.title = self.title.capitalize()
 		self.slug = slugify(self.title)
 		self.full_clean()
 		super(Event, self).save(*args, **kwargs)
