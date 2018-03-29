@@ -7,8 +7,8 @@
 	<form method="POST">
 		{% csrf_token %}
 		<p>Are you sure you want to delete the {{ calendar.event_calendar }} calendar? It will remove all events associated with the calendar.</p>
-		<button class="btn" type="submit" value="delete_calendar">Yes</button>
-		<button class="btn" type="button" onclick="window.location.href='{% url 'calendar_view' slug=calendar.slug %}'">No</button>
+		<button class="btn btn-default" type="submit" value="delete_calendar">Yes</button>
+		<button class="btn btn-default" type="button" onclick="window.location.href='{% url 'calendar_view' slug=calendar.slug %}'">No</button>
 	</form>
 </div>
 

@@ -7,8 +7,8 @@
 	<form method="POST">
 		{% csrf_token %}
 		<p>Are you sure you want to delete the {{ location.location }} location?</p>
-		<button class="btn" type="submit" value="delete_calendar">Yes</button>
-		<button class="btn" type="button" onclick="window.location.href='{% url 'location_view' slug=location.slug %}'">No</button>
+		<button class="btn btn-default" type="submit" value="delete_calendar">Yes</button>
+		<button class="btn btn-default" type="button" onclick="window.location.href='{% url 'location_view' slug=location.slug %}'">No</button>
 	</form>
 </div>
 
