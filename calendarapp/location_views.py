@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 
 def location_view(request, slug):
 	location = get_object_or_404(Location, slug=slug)
-	events = Event.objects.filter(location=location).order_by('start_date', 'start_time')
+	events = Event.objects.filter(location=location, end_date__gte=timezone.localtime().date()).order_by('start_date', 'start_time')
 	return render(request, 'location_view.html', {'location': location, 'events': events})
 
 @login_required

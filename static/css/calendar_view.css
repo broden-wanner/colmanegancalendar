@@ -1,0 +1,37 @@
+h1 {
+	font-size: 5em;
+}
+
+#calendar-info {
+	font-size: 1.2em;
+}
+
+#event-table {
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#calendar-buttons {
+	margin-top: 2em;
+}
+
+/* Sets hover settings for event rows */
+#event-table tr[data-calendar-pk]:hover {
+	cursor: pointer;
+	background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Sets width of columns */
+.time-column {
+	width: 30%;
+}
+.title-column {
+	width: 20%;
+}
+.event-info-column {
+	width: 50%;
+}
+
+/* Sets height of rows */
+.time-column, .title-column, .event-info-column {
+	height: 5%;
+}

@@ -9,6 +9,8 @@
 	<link rel="shortcut icon" href="{% static 'images/hawk.ico' %}" type="image/x-icon">
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Didact+Gothic">
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Arimo">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
 	{% block css %}
 	{% endblock %}
@@ -27,42 +29,42 @@
 			    <span class="icon-bar"></span>
 			    <span class="icon-bar"></span> 
 			</button>
-		  	<a class="navbar-brand" href="{% url 'home' %}">Colman-Egan Calendar</a>
+		  	<a class="navbar-brand" href="{% url 'home' %}"><img id="navbar-logo" src="{% static 'images/hawk.ico' %}">Colman-Egan Calendar</a>
 		</div>
+		{# Dislpays the pagination arrows for the calendar #}
+		<ul class="nav navbar-nav">
+			{% if pagination_links %}
+				{% if 'month' in request.path %}
+					<li>
+						<div class="btn-group">
+							<a class="btn btn-default navbar-btn" href="{% url 'month' year=previous_month.year.year month=previous_month.month %}" data-toggle="tooltip" data-placement="bottom" title="Previous Month"><span class="glyphicon glyphicon-arrow-left"></span></a>
+							<a class="btn btn-default navbar-btn" href="{% url 'month' year=next_month.year.year month=next_month.month %}" data-toggle="tooltip" data-placement="bottom" title="Next Month"><span class="glyphicon glyphicon-arrow-right"></span></a>
+						</div>
+					</li>
+				{% elif 'week' in request.path %}
+					<li>
+						<div class="btn-group">
+							<a class="btn btn-default navbar-btn" href="{% url 'week' year=first_day_of_last_week.month.year.year month=first_day_of_last_week.month.month first_day_of_week=first_day_of_last_week.day_of_month %}" data-toggle="tooltip" data-placement="bottom" title="Previous Week"><span class="glyphicon glyphicon-arrow-left"></span></a>
+							<a class="btn btn-default navbar-btn" href="{% url 'week' year=first_day_of_next_week.month.year.year month=first_day_of_next_week.month.month first_day_of_week=first_day_of_next_week.day_of_month %}" data-toggle="tooltip" data-placement="bottom" title="Next Week"><span class="glyphicon glyphicon-arrow-right"></span></a>
+						</div>
+					</li>
+				{% elif 'day' in request.path %}
+					<li>
+						<div class="btn-group">
+							<a class="btn btn-default navbar-btn" href="{% url 'day' year=previous_day.month.year.year month=previous_day.month.month day=previous_day.day_of_month %}" data-toggle="tooltip" data-placement="bottom" title="Previous Day"><span class="glyphicon glyphicon-arrow-left"></span></span></a>
+							<a class="btn btn-default navbar-btn" href="{% url 'day' year=next_day.month.year.year month=next_day.month.month day=next_day.day_of_month %}" data-toggle="tooltip" data-placement="bottom" title="Next Day"><span class="glyphicon glyphicon-arrow-right"></a>
+						</div>
+					</li>
+				{% endif %}
+				{# Displays the current month and year on the view #}
+			    <li><p class="navbar-text">{{ current_month.month_str }} {{ current_month.year.year }}</p></li>
+		    {% endif %}
+	  	</ul>
 		<div class="collapse navbar-collapse" id="calendar-navbar">
-			{# Dislpays the pagination arrows for the calendar #}
-			<ul class="nav navbar-nav">
-				{% if pagination_links %}
-					{% if 'month' in request.path %}
-						<li>
-							<div class="btn-group">
-								<a class="btn btn-default navbar-btn" href="{% url 'month' year=previous_month.year.year month=previous_month.month %}" data-toggle="tooltip" data-placement="bottom" title="Previous Month"><span class="glyphicon glyphicon-arrow-left"></span></a>
-								<a class="btn btn-default navbar-btn" href="{% url 'month' year=next_month.year.year month=next_month.month %}" data-toggle="tooltip" data-placement="bottom" title="Next Month"><span class="glyphicon glyphicon-arrow-right"></span></a>
-							</div>
-						</li>
-					{% elif 'week' in request.path %}
-						<li>
-							<div class="btn-group">
-								<a class="btn btn-default navbar-btn" href="{% url 'week' year=first_day_of_last_week.month.year.year month=first_day_of_last_week.month.month first_day_of_week=first_day_of_last_week.day_of_month %}" data-toggle="tooltip" data-placement="bottom" title="Previous Week"><span class="glyphicon glyphicon-arrow-left"></span></a>
-								<a class="btn btn-default navbar-btn" href="{% url 'week' year=first_day_of_next_week.month.year.year month=first_day_of_next_week.month.month first_day_of_week=first_day_of_next_week.day_of_month %}" data-toggle="tooltip" data-placement="bottom" title="Next Week"><span class="glyphicon glyphicon-arrow-right"></span></a>
-							</div>
-						</li>
-					{% elif 'day' in request.path %}
-						<li>
-							<div class="btn-group">
-								<a class="btn btn-default navbar-btn" href="{% url 'day' year=previous_day.month.year.year month=previous_day.month.month day=previous_day.day_of_month %}" data-toggle="tooltip" data-placement="bottom" title="Previous Day"><span class="glyphicon glyphicon-arrow-left"></span></span></a>
-								<a class="btn btn-default navbar-btn" href="{% url 'day' year=next_day.month.year.year month=next_day.month.month day=next_day.day_of_month %}" data-toggle="tooltip" data-placement="bottom" title="Next Day"><span class="glyphicon glyphicon-arrow-right"></a>
-							</div>
-						</li>
-					{% endif %}
-					{# Displays the current month and year on the view #}
-				    <li><p class="navbar-text">{{ current_month.month_str }} {{ current_month.year.year }}</p></li>
-			    {% endif %}
-		  	</ul>
 		  	<ul class="nav navbar-nav navbar-right">
 		  		{# Displays the 'new' links when appropriate #}
 		  		{% if new_event_or_calendar_links %}
-				    {% if perms.calendarapp.add_event or perms.calendarapp.add_calendar %}
+				    {% if perms.calendarapp.add_event or perms.calendarapp.add_calendar or perms.calendarapp.add_location %}
 					    <li class="dropdown">
 					        <a class="dropdown-toggle" data-toggle="dropdown">New <span class="caret"></span></a>
 					        <ul class="dropdown-menu">
@@ -93,7 +95,7 @@
 				{# Displays the login/signup/logout links when appropriate #}
 		  		{% if request.path != '/accounts/login/' or request.path != '/accounts/signup/' %}
 					{% if user.is_authenticated %}
-						<li><p class="navbar-text"><a href="{% url 'member_view' username=user.username %}"><span class="glyphicon glyphicon-user"></span> Hi, {{ user.username }}!</a></p></li>
+						<li><a href="{% url 'member_view' username=user.username %}"><span class="glyphicon glyphicon-user"></span> Hi, {{ user.username }}!</a></li>
 						<li><a href="{% url 'logout' %}?next={{request.path}}"> <span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
 					{% else %}
 						<li><a href="{% url 'login' %}?next={{ request.path }}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>

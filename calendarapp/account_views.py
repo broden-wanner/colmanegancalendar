@@ -13,6 +13,7 @@ from .tokens import account_activation_token
 from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
 from .forms import EventForm, CalendarForm, MemberCreationForm, MemberChangeForm
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 def signup(request):
 	if request.user.is_authenticated:
@@ -40,9 +41,13 @@ def signup(request):
 		form = MemberCreationForm()
 	return render(request, 'registration/signup.html', {'form': form})
 
+@login_required
 def member_view(request, username):
-	created_events = Event.objects.filter(creator=request.user).order_by('start_date', 'start_time')
-	return render(request, 'registration/member_view.html', {'created_events': created_events})
+	if not request.user.is_authenticated:
+		return redirect('home')
+	created_events = Event.objects.filter(creator=request.user, approved=True).order_by('start_date', 'start_time')
+	pending_events = Event.objects.filter(creator=request.user, approved=False).order_by('start_date', 'start_time')
+	return render(request, 'registration/member_view.html', {'created_events': created_events, 'pending_events': pending_events})
 
 def account_activation_sent(request):
 	return render(request, 'registration/account_activation_sent.html')
@@ -69,6 +74,7 @@ def activate(request, uidb64, token):
 		print(f'There was an error when {user} tried to activate')
 		return render(request, 'registration/account_activation_invalid.html')
 
+@login_required
 def edit_member_info(request, username):
 	if request.method == 'POST':
 		form = MemberChangeForm(request.POST, instance=request.user)

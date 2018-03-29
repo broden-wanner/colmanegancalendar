@@ -1,30 +1,68 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/calendar_view.css'%}">
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
-	<h1 style="background-color: {{ calendar.color }};">{{ calendar.event_calendar }} Calendar</h1>
-	<p>Default calendar: {{ calendar.default_calendar|yesno:'Yes, No' }}</p>
-	<p>Events asscociated with this calendar:</p>
-	{% if not events %}
-		<p>None</p>
-	{% else %}
-		<ul>
+	<h1 class="text-center" style="text-shadow: 1px 0px 0px #fff, 6px 5px 0px {{ calendar.color }};">{{ calendar.event_calendar }} Calendar</h1>
+	<p id="calendar-info">Events on this calendar happening in the future...</p>
+	<table class="table table-bordered" id="event-table">
+		{% if not events %}
+		<tr>
+			<td>No events for this calendar in the future</td>
+		</tr>
+		{% else %}
 			{% for event in events %}
-				<li><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">{{ event.start_date|date:'n/j/y' }} {{ event.start_time|date:'f a' }} {{ event.title }}</a></li>
+				<tr data-calendar-pk="{{ event.calendar.pk }}">
+					<td class="title-column">
+						{{ event.title }}
+					</td>
+					<td class="time-column">
+						<a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}"></a>
+						{% if event.all_day and event.start_date == event.end_date %}
+							{{ event.start_date }} (all-day)
+						{% elif event.all_day and event.start_date != event.end_date %}
+							{{ event.start_date }} - {{ event.end_date }} (all-day)
+						{% else %}
+							{{ event.start_date }}, {{ event.start_time }} &mdash; {{ event.end_date }}, {{ event.end_time }}
+						{% endif %}
+					</td>
+					<td class="event-info-column">
+						{% if event.event_info %}
+							{{ event.event_info }}
+						{% else %}
+							No event info
+						{% endif %}
+					</td>
+				</tr>
 			{% endfor %}
-		</ul>
-	{% endif %}
+		{% endif %}
+	</table>
 
-	{% if perms.calendarapp.add_event %}
-		<p><a href="{% url 'new_event' %}">Add an event to the calendar</a></p>
-	{% endif %}
-	{% if perms.calendarapp.change_calendar %}
-		<p><a href="{% url 'edit_calendar' slug=calendar.slug %}">Edit Calendar</a></p>
-	{% endif %}
-	{% if perms.calendarapp.delete_calendar %}
-		<p><a href="{% url 'delete_calendar' slug=calendar.slug %}">Delete Calendar</a></p>
-	{% endif %}
+	<div class="row" id="calendar-buttons">
+		<div class="col-sm-6">
+			{% if perms.calendarapp.change_calendar %}
+				<p><a class="btn btn-default" href="{% url 'edit_calendar' slug=calendar.slug %}">Edit Calendar</a></p>
+			{% endif %}
+		</div>
+		<div class="col-sm-6">
+			{% if perms.calendarapp.delete_calendar %}
+				<p><a class="btn btn-default pull-right" href="{% url 'delete_calendar' slug=calendar.slug %}">Delete Calendar</a></p>
+			{% endif %}
+		</div>
+	</div>
 </div>
+
+<script type="text/javascript">
+//Allows users to click entire row to navigate to event
+$('tr[data-calendar-pk]').click( function() {
+	window.location = $(this).find('a').attr('href');
+});
+</script>
 
 {% endblock %}

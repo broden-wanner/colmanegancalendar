@@ -9,12 +9,22 @@
 {% block content %}
 
 <div class="container">
-	<h1>New Calendar</h1>
-	<form method="POST" enctype="multipart/form-data">
-		{% csrf_token %}
-		{{ new_calendar_form.as_p }}
-		<button type="submit" value="create_calendar">Create Calendar</button>
-	</form>
+	<div class="row">
+		<div class="col-sm-6">
+			<h1>New Calendar</h1>
+			<form method="POST" enctype="multipart/form-data">
+				{% csrf_token %}
+				{% for field in new_calendar_form %}
+					<div class="form-group">
+						{{ field.errors }}
+						{{ field.label_tag }}{% if forloop.counter == 1 or forloop.counter == 2 %}<br>{% endif %}
+						{{ field }}
+					</div>
+				{% endfor %}
+				<button class="btn" type="submit" value="create_calendar">Create Calendar</button>
+			</form>
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript" src="{% static 'js/spectrum.js' %}"></script>

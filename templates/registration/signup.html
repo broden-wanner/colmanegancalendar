@@ -1,12 +1,31 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/account_create_edit.css'%}">
+{% endblock %}
+
 {% block content %}
 <div class="container">
-	<h2>Sign up</h2>
-	<form method="post">
-		{% csrf_token %}
-		{{ form.as_p }}
-		<button type="submit" value="sign_up">Sign up</button>
-	</form>
+	<div class="row">
+		<div class="col-sm-6">
+			<h1>Sign up</h1>
+			<form method="post">
+				{% csrf_token %}
+				{% for field in form %}
+					<div class="form-group">
+						{{ field.errors }}
+						{{ field.label_tag }} {{ field }}
+						{% if field.help_text %}
+							<p class="help">{{ field.help_text|safe }}</p>
+						{% endif %}
+					</div>
+				{% endfor %}
+				<button class="btn" type="submit" value="sign_up">Sign up</button>
+			</form>
+			<br>
+		</div>
+	</div>
 </div>
 {% endblock %}

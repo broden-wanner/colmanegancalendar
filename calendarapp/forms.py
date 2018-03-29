@@ -139,6 +139,9 @@ class CalendarForm(forms.ModelForm):
 		model = Calendar
 		fields = ('event_calendar', 'color', 'default_calendar')
 		labels = {'event_calendar': 'Name:'}
+		widgets = {
+			'event_calendar': forms.TextInput(attrs={'class': 'form-control'}),
+		}
 
 class LocationForm(forms.ModelForm):
 
@@ -149,13 +152,36 @@ class LocationForm(forms.ModelForm):
 		labels = {'location': 'Location name:'}
 
 class MemberCreationForm(UserCreationForm):
-	first_name = forms.CharField(max_length=30)
-	last_name = forms.CharField(max_length=30)
-	email = forms.EmailField(max_length=254, help_text='Required. Input a valid email address.', required=True)
+	first_name = forms.CharField(
+		max_length=30,
+		widget=forms.TextInput(attrs={'class': 'form-control'})
+	)
+	last_name = forms.CharField(
+		max_length=30,
+		widget=forms.TextInput(attrs={'class': 'form-control'})
+	)
+	email = forms.EmailField(
+		max_length=254,
+		help_text='Required. Input a valid email address.',
+		required=True,
+		widget=forms.EmailInput(attrs={'class': 'form-control'})
+	)
 	calendar_preferences = forms.ModelMultipleChoiceField(
 		queryset=Calendar.objects.filter(approved=True).order_by('event_calendar'),
 		widget=forms.CheckboxSelectMultiple(),
 		required=False
+	)
+	password1 = forms.CharField(
+		widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+		required=True,
+		label='Password',
+		help_text="<ul><li>Your password can't be too similar to your other personal information.</li><li>Your password must contain at least 8 characters.</li><li>Your password can't be a commonly used password.</li><li>Your password can't be entirely numeric.</li></ul>"
+	)
+	password2 = forms.CharField(
+		widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+		required=True,
+		label='Password Confirmation',
+		help_text='Enter the same password as before, for verification.'
 	)
 
 	class Meta:
@@ -169,6 +195,9 @@ class MemberCreationForm(UserCreationForm):
 			'password2',
 			'calendar_preferences'
 		)
+		widgets = {
+			'username': forms.TextInput(attrs={'class': 'form-control'}),
+		}
 
 	def clean_email(self):
 		email = self.cleaned_data.get('email')
@@ -178,7 +207,7 @@ class MemberCreationForm(UserCreationForm):
 		return email
 
 class MemberChangeForm(forms.ModelForm):
-	username = forms.CharField()
+	username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
 	calendar_preferences = forms.ModelMultipleChoiceField(
 		queryset=Calendar.objects.filter(approved=True).order_by('event_calendar'),
 		widget=forms.CheckboxSelectMultiple(),
@@ -194,6 +223,11 @@ class MemberChangeForm(forms.ModelForm):
 			'email',
 			'calendar_preferences',
 		)
+		widgets = {
+			'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+			'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+			'email': forms.EmailInput(attrs={'class': 'form-control'}),
+		}
 
 	def clean_email(self):
 		email = self.cleaned_data.get('email')

@@ -1,27 +1,60 @@
+/*Adds margin on top for navbar */
 body {
 	margin-top: 50px;
 }
 
+/* Sets body font */
+* {
+	font-family: 'Arimo', sans-serif;
+}
+
+/* Sets heading font */
+h1, h2, h3, h4, h5, h6, a.navbar-brand {
+	font-family: 'Didact Gothic', sans-serif;
+}
+
+/* Gets rid of curve on nav-bar */
 .navbar {
     border-radius: 0px;
     background-color: black;
 }
 
+/* Set position of logo */
+#navbar-logo {
+	height: calc(100% + 15px);
+	width: auto;
+	display: inline;
+	margin: -0.3em 0.3em 0 0;
+}
+
+/* Adjusts the pagination arrows */
+.navbar .btn-group {
+	margin-left: 1em;
+}
+
+/* Set color and font of navbar-brand */
+.navbar-header a.navbar-brand, .navbar-header a.navbar-brand:hover {
+	font-size: 1.5em;
+	color: #F5A719;
+}
+
+/* Dropdowns drop on hover */
 .dropdown:hover .dropdown-menu {
     display: block;
     margin-top: 0;
  }
 
+/* Removes padding for page dividers */
  hr {
  	margin: 0;
  	padding: 0;
  }
 
+/* Colors all links and removes underline */
  a, a:hover, a:focus, a:visited {
- 	text-decoration: none;
  	color: #9d9d9d;
  }
 
- p.navbar-text a:hover {
- 	color: white;
+ a.btn {
+ 	color: black;
  }

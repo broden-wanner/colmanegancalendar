@@ -1,33 +1,117 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/member_view.css'%}">
+{% endblock %}
+
 {% block content %}
 <div class="container">
-	<h2>{{ user.username }} Account Info</h2>
-	<p>First Name: {{ user.first_name }}</p>
-	<p>Last Name: {{ user.last_name }}</p>
-	<p>Email: {{ user.email }}</p>
-	<p>Calendar Preferences:</p>
-	{% if user.member.calendar_preferences.all %}
-		<ul>
-			{% for calendar in user.member.calendar_preferences.all %}
-				<li>{{ calendar.event_calendar }}</li>
-			{% endfor %}
-		</ul>
-	{% else %}
-		<p>&emsp;You have no calendar preferences</p>
-	{% endif %}
-	<p>Created Events:</p>
-	{% if created_events %}
-		<ul>
-			{% for event in created_events %}
-				<li data-calendar-pk="{{ event.calendar.pk }}"><a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}" style="color: {{ event.calendar.color }};"> {% if not event.all_day%}{{ event.start_time|time:'f A' }}{% endif %} {{ event.title }}</a></li>
-			{% endfor %}
-		</ul>
-	{% else %}
-		<p>&emsp;You have not created any events.</p>
-	{% endif %}
-	<p><a href="{% url 'edit_member_info' username=user.username %}">Edit Profile</a></p>
-	<p><a href="{% url 'password_reset' %}">Reset Password</a></p>
+<div class="row">
+	<h1 class="text-center">{{ user.username }} Account Info</h1>
+	<div class="col-sm-3" id="user-info">
+		<p><span class="user-label">First Name:</span> {{ user.first_name }}</p>
+		<p><span class="user-label">Last Name:</span> {{ user.last_name }}</p>
+		<p><span class="user-label">Email:</span> {{ user.email }}</p>
+		<p><span class="user-label">Calendar Preferences:</span></p>
+		{% if user.member.calendar_preferences.all %}
+			<ul>
+				{% for calendar in user.member.calendar_preferences.all %}
+					<li>{{ calendar.event_calendar }} <span class="bullet" style="background-color: {{ calendar.color }};"></span></li>
+				{% endfor %}
+			</ul>
+		{% else %}
+			<p>&emsp;You have no calendar preferences</p>
+		{% endif %}
+		<div class="row" id="user-buttons">
+			<div class="col-sm-6">
+				<p><a class="btn btn-default" href="{% url 'edit_member_info' username=user.username %}">Edit Profile</a></p>
+			</div>
+			<div class="col-sm-6">
+				<p><a class="btn btn-default" href="{% url 'password_reset' %}">Reset Password</a></p>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-9">
+		<p class="calendar-label">Pending Events:</p>
+		<table class="table table-bordered event-table">
+			{% if not pending_events %}
+			<tr>
+				<td>You have no pending events.</td>
+			</tr>
+			{% else %}
+				{% for event in pending_events %}
+					<tr data-calendar-pk="{{ event.calendar.pk }}" style="background-color: {{ event.calendar.color }};">
+						<td class="title-column">
+							{{ event.title }}
+						</td>
+						<td class="time-column">
+							<a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}"></a>
+							{% if event.all_day and event.start_date == event.end_date %}
+								{{ event.start_date }} (all-day)
+							{% elif event.all_day and event.start_date != event.end_date %}
+								{{ event.start_date }} - {{ event.end_date }} (all-day)
+							{% else %}
+								{{ event.start_date }}, {{ event.start_time }} &mdash; {{ event.end_date }}, {{ event.end_time }}
+							{% endif %}
+						</td>
+						<td class="event-info-column">
+							{% if event.event_info %}
+								{{ event.event_info }}
+							{% else %}
+								No event info
+							{% endif %}
+						</td>
+					</tr>
+				{% endfor %}
+			{% endif %}
+		</table>
+
+		<p class="calendar-label">Created and Approved Events:</p>
+		<table class="table table-bordered event-table">
+			{% if not created_events %}
+			<tr>
+				<td>You have not created or approved any events</td>
+			</tr>
+			{% else %}
+				{% for event in created_events %}
+					<tr data-calendar-pk="{{ event.calendar.pk }}" style="background-color: {{ event.calendar.color }};">
+						<td class="title-column">
+							{{ event.title }}
+						</td>
+						<td class="time-column">
+							<a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}"></a>
+							{% if event.all_day and event.start_date == event.end_date %}
+								{{ event.start_date }} (all-day)
+							{% elif event.all_day and event.start_date != event.end_date %}
+								{{ event.start_date }} - {{ event.end_date }} (all-day)
+							{% else %}
+								{{ event.start_date }}, {{ event.start_time }} &mdash; {{ event.end_date }}, {{ event.end_time }}
+							{% endif %}
+						</td>
+						<td class="event-info-column">
+							{% if event.event_info %}
+								{{ event.event_info }}
+							{% else %}
+								No event info
+							{% endif %}
+						</td>
+					</tr>
+				{% endfor %}
+			{% endif %}
+		</table>
+	</div>
+
 </div>
+</div>
+
+<script type="text/javascript">
+//Allows users to click entire row to navigate to event
+$('tr[data-calendar-pk]').click( function() {
+	window.location = $(this).find('a').attr('href');
+});
+</script>
 
 {% endblock %}

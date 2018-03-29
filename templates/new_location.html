@@ -3,12 +3,14 @@
 {% block content %}
 
 <div class="container">
-	<h1>New Location</h1>
 	<div class="row">
 		<div class="col-sm-6">
+			<h1>New Location</h1>
 			<form method="POST" enctype="multipart/form-data">
 				{% csrf_token %}
-				{{ new_location_form.as_p }}
+				<div class="form-group">
+					{{ new_location_form.as_p }}
+				</div>
 				<button class="btn" type="submit" value="create_location">Create Location</button>
 			</form>
 		</div>

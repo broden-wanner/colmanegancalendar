@@ -2,12 +2,27 @@
 
 {% block content %}
 <div class="container">
-	<h1>Login</h1>
-	<form method="POST">
-		{% csrf_token %}
-		{{ form.as_p }}
-		<input type="submit" value="Login">
-	</form>
-	<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+	<div class="row">
+		<div class="col-sm-4 col-sm-offset-4">
+			<h1 class="text-center">Login</h1>
+			<form method="POST">
+				{% csrf_token %}
+				{{ form.non_field_errors }}
+				<div class="form-group">
+					{{ form.username.errors }}
+					{{ form.username.label_tag }}
+					<input class="form-control" id="{{ form.username.id_for_label }}" name="{{ form.username.html_name }}" type="text">
+				</div>
+				<div class="form-group">
+					{{ form.password.errors }}
+					{{ form.password.label_tag }}
+					<input class="form-control" id="{{ form.password.id_for_label }}" name="{{ form.password.html_name }}" type="password">
+				</div>
+				<input class="btn" type="submit" value="Login">
+			</form>
+			<br>
+			<a href="{% url 'password_reset' %}" role="button">Lost password?</a>
+		</div>
+	</div>
 </div>
 {% endblock %}

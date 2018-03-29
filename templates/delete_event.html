@@ -8,8 +8,8 @@
 		{% csrf_token %}
 		<p>Are you sure you want to delete the {{ event.title }} event?</p>
 		{{ reason_form.as_p }}
-		<button type="submit" value="delete_event">Delete</button>
-		<button type="button" onclick="window.location.href='{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}'">Don't Delete</button>
+		<button class="btn" type="submit" value="delete_event">Delete</button>
+		<button class="btn" type="button" onclick="window.location.href='{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}'">Don't Delete</button>
 	</form>
 </div>
 

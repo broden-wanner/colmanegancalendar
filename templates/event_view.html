@@ -1,33 +1,50 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/event_view.css' %}">
+{% endblock %}
+
 {% block content %}
-	<div class="container">
-		<h1>{{ event.title }}</h1>
-		<p>Calendar: {{ event.calendar.event_calendar }}</p>
-		<p>Event Info: {% if event.event_info %}{{ event.event_info }}{% else %}None{% endif %}</p>
-		<p>Location: {% if event.location %}{{ event.location.location }}{% else %}None{% endif %}</p>
-		<p>Starts: {{ event.start_date }}{% if not event.all_day %}, {{ event.start_time }}{% endif %}</p>
-		<p>Ends: {{ event.end_date }}{% if not event.all_day %}, {{ event.end_time }}{% endif %}</p>
-		<p>All day: {{ event.all_day|yesno:'Yes, No' }}</p>
-		<p>Repeats: {{ event.repeat|yesno:'Yes, No' }}</p>
+<div class="container">
+	<div class="row">
+		<div class="col-sm-6 col-sm-offset-3" id="event-info">
+		<h1 class="text-center">{{ event.title }}</h1>
+		<p><span class="event-label">Calendar:</span> {{ event.calendar.event_calendar }} <span class="bullet" style="background-color: {{ event.calendar.color }};"></span></p><hr>
+		<p><span class="event-label">Event Info:</span> {% if event.event_info %}{{ event.event_info }}{% else %}None{% endif %}</p><hr>
+		<p><span class="event-label">Location:</span> {% if event.location %}{{ event.location.location }}{% else %}None{% endif %}</p><hr>
+		<p><span class="event-label">Starts:</span> {{ event.start_date }}{% if not event.all_day %}, {{ event.start_time }}{% endif %}</p><hr>
+		<p><span class="event-label">Ends:</span> {{ event.end_date }}{% if not event.all_day %}, {{ event.end_time }}{% endif %}</p><hr>
+		<p><span class="event-label">All day:</span> {{ event.all_day|yesno:'Yes, No' }}</p><hr>
+		<p><span class="event-label">Repeats:</span> {{ event.repeat|yesno:'Yes, No' }}</p><hr>
 		{% if event.repeat %}
-			<p>Repeats every {{ event.repeat_every }} {{ event.get_duration_display }}{% if event.repeat_on and event.get_duration_display == 'Weeks' %} on {% for day in event.repeat_on.all %}{{ day.day_of_week }}{% if not forloop.last %}, {% endif%}{% endfor %}{% endif %}</p>
+			<p><span class="event-label">Repeats every:</span> {{ event.repeat_every }} {{ event.get_duration_display }}{% if event.repeat_on and event.get_duration_display == 'Weeks' %} on {% for day in event.repeat_on.all %}{{ day.day_of_week }}{% if not forloop.last %}, {% endif%}{% endfor %}{% endif %}</p><hr>
 			{% if event.ends_on %}
-				<p>Ends on {{ event.ends_on }}</p>
+				<p><span class="event-label">Ends on:</span> {{ event.ends_on }}</p><hr>
 			{% elif event.ends_after %}
-				<p>Ends after {{ event.ends_after }} occurences</p>
+				<p><span class="event-label">Ends after:</span> {{ event.ends_after }} occurences</p><hr>
 			{% endif %}
 		{% endif %}
-		<p>Created by: {{ event.creator.username }} on {{ event.date_created }}</p>
+		<p><span class="event-label">Created by:</span> {{ event.creator.username }} on {{ event.date_created }}</p><hr>
 		{% if event.editor %}
-		<p>Edited by: {{ event.editor }} on {{ event.edited_time }}</p>
+		<p><span class="event-label">Edited by:</span> {{ event.editor }} on {{ event.edited_time }}</p>
 		{% endif %}
 
-		{% if perms.calendarapp.change_event %}
-			<p><a href="{% url 'edit_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Edit Event</a></p>
-		{% endif %}
-		{% if perms.calendarapp.delete_event %}
-			<p><a href="{% url 'delete_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Delete Event</a></p>
-		{% endif %}
+		<div class="row" id="event-buttons">
+			<div class="col-sm-6">
+				{% if perms.calendarapp.change_event %}
+					<p><a class="btn btn-default" href="{% url 'edit_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Edit Event</a></p>
+				{% endif %}
+			</div>
+			<div class="col-sm-6">
+				{% if perms.calendarapp.delete_event %}
+					<p><a class="btn btn-default pull-right" href="{% url 'delete_event' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">Delete Event</a></p>
+				{% endif %}
+			</div>
+		</div>
+
+		</div>
 	</div>
+</div>
 {% endblock %}
