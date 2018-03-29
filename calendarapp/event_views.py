@@ -48,6 +48,7 @@ def newEventView(request):
 			if Group.objects.get(name='Admins') in request.user.groups.all():
 				new_event.approved = True
 			new_event.save()
+			new_event_form.save_m2m()
 			new_event.set_days_of_event()
 			if Group.objects.get(name='Admins') in request.user.groups.all():
 				return redirect('month', year=new_event.start_date.year, month=new_event.start_date.month)
@@ -166,6 +167,7 @@ def editEventView(request, year, month, day, pk, slug):
 				changed_event.editor = request.user
 				changed_event.edited_time = timezone.now()
 				changed_event.save()
+				event_form.save_m2m()
 				changed_event.set_days_of_event()
 				original_event = Event.objects.get(pk=request.session['original_event_pk'])
 				if Group.objects.get(name='Admins') in request.user.groups.all():

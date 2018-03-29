@@ -40,7 +40,7 @@
 											{% if not event.all_day and event.start_date.day == day.day_of_month and event.start_date.month == day.month.month %}
 												{{ event.start_time|time:'f A' }}
 											{% endif %}
-											{{ event.title }} {% if event.start_date.day != day.day_of_month %}(continued){% endif %}
+											{{ event.title }} {% if event.start_date.day != day.day_of_month and not event.repeat %}(continued){% endif %}
 										</a>
 									</li>
 								{% endfor %}

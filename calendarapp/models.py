@@ -223,6 +223,7 @@ class Event(models.Model):
 			elif self.duration == '2':
 				this_week = 0
 				day_counter = 1
+				print(self.repeat_on.all())
 				#If set to end on a certain day
 				if self.ends_on:
 					temp_recurring_days = Day.objects.filter(id__gt=first_day.id, id__lte=first_day.id + (self.ends_on - self.start_date).days)
