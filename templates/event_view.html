@@ -11,9 +11,9 @@
 	<div class="row">
 		<div class="col-sm-6 col-sm-offset-3" id="event-info">
 		<h1 class="text-center">{{ event.title }}</h1>
-		<p><span class="event-label">Calendar:</span> {{ event.calendar.event_calendar }} <span class="bullet" style="background-color: {{ event.calendar.color }};"></span></p><hr>
+		<p><span class="event-label">Calendar:</span> <a href="{% url 'calendar_view' slug=event.calendar.slug %}">{{ event.calendar.event_calendar }}</a> <span class="bullet" style="background-color: {{ event.calendar.color }};"></span></p><hr>
 		<p><span class="event-label">Event Info:</span> {% if event.event_info %}{{ event.event_info }}{% else %}None{% endif %}</p><hr>
-		<p><span class="event-label">Location:</span> {% if event.location %}{{ event.location.location }}{% else %}None{% endif %}</p><hr>
+		<p><span class="event-label">Location:</span> {% if event.location %}<a href="{% url 'location_view' slug=event.location.slug %}">{{ event.location.location }}</a>{% else %}None{% endif %}</p><hr>
 		<p><span class="event-label">Starts:</span> {{ event.start_date }}{% if not event.all_day %}, {{ event.start_time }}{% endif %}</p><hr>
 		<p><span class="event-label">Ends:</span> {{ event.end_date }}{% if not event.all_day %}, {{ event.end_time }}{% endif %}</p><hr>
 		<p><span class="event-label">All day:</span> {{ event.all_day|yesno:'Yes, No' }}</p><hr>

@@ -78,10 +78,7 @@
 		$.ajax({
 			url: {% url 'ajax_show_hide_calendars' %},
 			data: {'shown_calendar_pks': calendars_to_show},
-			dataType: 'json',
-			success: function (data) {
-				console.log(data.hidden_calendar_pks)
-			}
+			dataType: 'json'
 		});
 		//Show all events associated with chosen calendar
 		if(calendars_to_show.length) {

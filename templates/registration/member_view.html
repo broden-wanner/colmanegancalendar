@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load staticfiles %}
+{% load calendar_tags %}
 
 {% block css %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/member_view.css'%}">
@@ -35,6 +36,7 @@
 	</div>
 
 	<div class="col-md-9">
+		{% if not request.user|in_group:'Admins' %}
 		<p class="calendar-label">Pending Events:</p>
 		<table class="table table-bordered event-table">
 			{% if not pending_events %}
@@ -68,6 +70,7 @@
 				{% endfor %}
 			{% endif %}
 		</table>
+		{% endif %}
 
 		<p class="calendar-label">Created and Approved Events:</p>
 		<table class="table table-bordered event-table">

@@ -10,6 +10,12 @@ h1 {
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
+#event-table tr[data-calendar-pk] td {
+	border: 3px solid white;
+	color: white;
+	text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 #location-buttons {
 	margin-top: 2em;
 }

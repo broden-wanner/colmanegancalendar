@@ -1,14 +1,7 @@
-0.5 when hosting, use cron to delete unapproved events after four days
-
-2. Add pending/approved events on user page
-
 3. Admin
 	-Allow admins to see all pending events and approve them from the page
 	-Pass in a form with check boxes to delete the checked ones
 
-Save calendar preferences with ajax if logged, else use sessions
-
 4. have ability to change between month, week, and day views without reloading
 5. maybe delete and edit events without reloading page
-6. Use session data to keep calendar filter choices
 7. Make it so recurring events acutally create multiple events (use an 'EventGroup' model to associate them)

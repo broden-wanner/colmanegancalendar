@@ -3,13 +3,23 @@
 {% block content %}
 
 <div class="container">
-	<h1>Delete Location</h1>
-	<form method="POST">
-		{% csrf_token %}
-		<p>Are you sure you want to delete the {{ location.location }} location?</p>
-		<button class="btn btn-default" type="submit" value="delete_calendar">Yes</button>
-		<button class="btn btn-default" type="button" onclick="window.location.href='{% url 'location_view' slug=location.slug %}'">No</button>
-	</form>
+	<div class="row">
+		<div class="col-sm-6 col-sm-offset-3">
+			<h1 class="text-center">Delete Location</h1>
+			<form method="POST">
+				{% csrf_token %}
+				<p>Are you sure you want to delete the <strong>{{ location.location }}</strong> location?</p>
+				<div class="row">
+					<div class="col-sm-6">
+						<button class="btn btn-default" type="submit" value="delete_location">Yes</button>
+					</div>
+					<div class="col-sm-6">
+						<button class="btn btn-default pull-right" type="button" onclick="window.location.href='{% url 'location_view' slug=location.slug %}'">No</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
 </div>
 
 {% endblock %}

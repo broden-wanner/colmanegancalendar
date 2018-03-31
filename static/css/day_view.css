@@ -41,6 +41,13 @@ tr[data-calendar-pk] td {
 	background-color: rgba(0, 0, 0, 0.2) !important;
 }
 
+/* Makes border of the table thick and white */
+#day-table tr[data-calendar-pk] td {
+	border: 3px solid white;
+	border-right: 0;
+	text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 /* Creates today highlight for today */
 .today-number div, .today-number:hover div {
 	color: #F5A719;

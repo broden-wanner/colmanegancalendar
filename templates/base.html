@@ -62,6 +62,17 @@
 	  	</ul>
 		<div class="collapse navbar-collapse" id="calendar-navbar">
 		  	<ul class="nav navbar-nav navbar-right">
+		  		{# Displays the current type of view and a dropdown to change view #}
+				{% if pagination_links %}
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown">{{ type_of_view }} <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="{% url 'month' year=current_month.year.year month=current_month.month %}">Month</a></li>
+							<li><a href="{% url 'week' year=first_day_of_week.month.year.year month=first_day_of_week.month.month first_day_of_week=first_day_of_week.day_of_month %}">Week</a></li>
+							<li><a href="{% url 'day' year=day_view_day.month.year.year month=day_view_day.month.month day=day_view_day.day_of_month %}">Day</a></li>
+						</ul>
+					</li>
+				{% endif %}
 		  		{# Displays the 'new' links when appropriate #}
 		  		{% if new_event_or_calendar_links %}
 				    {% if perms.calendarapp.add_event or perms.calendarapp.add_calendar or perms.calendarapp.add_location %}
@@ -80,17 +91,6 @@
 					        </ul>
 					     </li>
 					{% endif %}
-				{% endif %}
-				{# Displays the current type of view and a dropdown to change view #}
-				{% if pagination_links %}
-					<li class="dropdown">
-						<a class="dropdown-toggle" data-toggle="dropdown">{{ type_of_view }} <span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							<li><a href="{% url 'month' year=current_month.year.year month=current_month.month %}">Month</a></li>
-							<li><a href="{% url 'week' year=first_day_of_week.month.year.year month=first_day_of_week.month.month first_day_of_week=first_day_of_week.day_of_month %}">Week</a></li>
-							<li><a href="{% url 'day' year=day_view_day.month.year.year month=day_view_day.month.month day=day_view_day.day_of_month %}">Day</a></li>
-						</ul>
-					</li>
 				{% endif %}
 				{# Displays the login/signup/logout links when appropriate #}
 		  		{% if request.path != '/accounts/login/' or request.path != '/accounts/signup/' %}

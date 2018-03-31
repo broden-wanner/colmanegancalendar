@@ -193,14 +193,6 @@ def ajax_show_hide_calendars(request):
 	else:
 		shown_calendar_pks = []
 		hidden_calendar_pks = [x.pk for x in Calendar.objects.all()]
-	if request.user.is_authenticated:
-		for calendar in request.user.member.calendar_preferences.all():
-			request.user.member.calendar_preferences.remove(calendar)		
-		for calendar in Calendar.objects.filter(pk__in=shown_calendar_pks):
-			request.user.member.calendar_preferences.add(calendar)
 	request.session['shown_calendar_pks'] = shown_calendar_pks
 	request.session['hidden_calendar_pks'] = hidden_calendar_pks
-	data = {
-		'hidden_calendar_pks': hidden_calendar_pks
-	}
-	return JsonResponse(data)
+	return JsonResponse({'done': True})
