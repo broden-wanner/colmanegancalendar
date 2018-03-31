@@ -12,6 +12,7 @@ from django.template.loader import render_to_string
 from .tokens import account_activation_token
 from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
 from .forms import EventForm, CalendarForm, MemberCreationForm, MemberChangeForm
+from .calendar_views import handle_deleting_of_copied_and_unapproved_events
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
@@ -43,6 +44,7 @@ def signup(request):
 
 @login_required
 def member_view(request, username):
+	handle_deleting_of_copied_and_unapproved_events()
 	if not request.user.is_authenticated:
 		return redirect('home')
 	created_events = Event.objects.filter(creator=request.user, approved=True).order_by('start_date', 'start_time')

@@ -11,6 +11,7 @@ urlpatterns = [
 	path('month/<int:year>/<int:month>/', calendar_views.calendarMonthView, name='month'),
 	path('week/<int:year>/<int:month>/<int:first_day_of_week>/', calendar_views.calendarWeekView, name='week'),
 	path('day/<int:year>/<int:month>/<int:day>/', calendar_views.calendarDayView, name='day'),
+	path('ajax_show_hide_calendars/', calendar_views.ajax_show_hide_calendars, name='ajax_show_hide_calendars'),
 ]
 
 #Event Views

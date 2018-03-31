@@ -8,10 +8,12 @@ import time
 from django.template.loader import render_to_string
 from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
 from .forms import EventForm, CalendarForm, MemberCreationForm, MemberChangeForm, ReasonForCalendarRejectForm
+from .calendar_views import handle_deleting_of_copied_and_unapproved_events
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
 def calendarView(request, slug):
+	handle_deleting_of_copied_and_unapproved_events()
 	calendar = get_object_or_404(Calendar, slug=slug)
 	events = Event.objects.filter(approved=True, calendar=calendar, end_date__gte=timezone.localtime().date()).order_by('start_date', 'start_time')
 	return render(request, 'calendar_view.html', {'calendar': calendar, 'events': events})

@@ -1,35 +1,42 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from django.contrib.auth.models import Group
+import json
+from django.http import JsonResponse
 from django.utils import timezone
 import datetime
 import time
 from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
 
-def return_calendars(request, option):
-	#Determines calendars to hide
-	if request.user.is_authenticated:
-		shown_calendars = request.user.member.calendar_preferences.all()
-		shown_calendar_pks = [calendar.pk for calendar in shown_calendars]
-		hidden_calendars = Calendar.objects.exclude(pk__in=shown_calendar_pks).exclude(approved=False)
-		#If user has no preferences, display default calendars
-		if not shown_calendars:
-			hidden_calendars = Calendar.objects.exclude(default_calendar=True).exclude(approved=False)
-			shown_calendars = Calendar.objects.filter(default_calendar=True).exclude(approved=False)
-	else:
-		hidden_calendars = Calendar.objects.exclude(default_calendar=True).exclude(approved=False)
-		shown_calendars = Calendar.objects.filter(default_calendar=True).exclude(approved=False)
+def handle_calendar_display(request):
+	#Determines calendars to hide if not in the session (upon the user first navigating to the site)
+	if 'hidden_calendar_pks' not in request.session:
+		if request.user.is_authenticated:
+			shown_calendars = request.user.member.calendar_preferences.all()
+			shown_calendar_pks = [calendar.pk for calendar in shown_calendars]
+			hidden_calendar_pks = [calendar.pk for calendar in Calendar.objects.exclude(pk__in=shown_calendar_pks).exclude(approved=False)]
+			#If user has no preferences, display default calendars
+			if not shown_calendars:
+				hidden_calendar_pks = [calendar.pk for calendar in Calendar.objects.exclude(default_calendar=True).exclude(approved=False)]
+				shown_calendar_pks = [calendar.pk for calendar in Calendar.objects.filter(default_calendar=True).exclude(approved=False)]
+		else:
+			hidden_calendar_pks = [calendar.pk for calendar in Calendar.objects.exclude(default_calendar=True).exclude(approved=False)]
+			shown_calendar_pks = [calendar.pk for calendar in Calendar.objects.filter(default_calendar=True).exclude(approved=False)]
 
-	if option == 'shown_calendars':
-		return shown_calendars
-	elif option == 'hidden_calendars':
-		return hidden_calendars
+		request.session['shown_calendar_pks'] = shown_calendar_pks
+		request.session['hidden_calendar_pks'] = hidden_calendar_pks
 
-def delete_unapproved_events_after_4_days():
+def handle_deleting_of_copied_and_unapproved_events():
 	for event in Event.objects.filter(approved=False):
-		if event.edited_time + datetime.timedelta(days=4) < timezone.now():
+		#Delete event if it was created by an admin and is unapproved (this means that it's a copy)
+		if Group.objects.get(name='Admins') in event.creator.groups.all():
+			event.delete()
+		#Delete unapproved event if it is over 4 days old
+		elif event.edited_time + datetime.timedelta(days=4) < timezone.now():
 			event.delete()
 
 def calendarHomeView(request):
-	delete_unapproved_events_after_4_days()
+	handle_deleting_of_copied_and_unapproved_events()
+	handle_calendar_display(request)
 	if request.session.get('calendar_view', None):
 		if request.session['calendar_view'] == 'month':
 			return redirect('month', year=request.session['last_year_visited'], month=request.session['last_month_visited'])
@@ -43,7 +50,8 @@ def calendarHomeView(request):
 		return redirect('month', year=timezone.now().year, month=timezone.now().month)
 
 def calendarMonthView(request, year, month):
-	delete_unapproved_events_after_4_days()
+	handle_deleting_of_copied_and_unapproved_events()
+	handle_calendar_display(request)
 	current_year = get_object_or_404(Year, year=year)
 	current_month = get_object_or_404(Month, year=current_year, month=month)		
 	days_of_month = get_list_or_404(Day, month=current_month)
@@ -117,12 +125,11 @@ def calendarMonthView(request, year, month):
 		'calendars': Calendar.objects.filter(approved=True).order_by('event_calendar'),
 		'locations': Location.objects.filter(approved=True).order_by('location'),
 		'first_day_of_week': first_day_of_week,
-		'shown_calendars': return_calendars(request, 'shown_calendars'),
-		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
 	})
 
 def calendarWeekView(request, year, month, first_day_of_week):
-	delete_unapproved_events_after_4_days()
+	handle_deleting_of_copied_and_unapproved_events()
+	handle_calendar_display(request)
 	this_year = get_object_or_404(Year, year=year)
 	this_month = get_object_or_404(Month, year=this_year, month=month)
 	first_day = get_object_or_404(Day, month=this_month, day_of_month=first_day_of_week)
@@ -146,13 +153,12 @@ def calendarWeekView(request, year, month, first_day_of_week):
 		'first_day_of_last_week': first_day_of_last_week,
 		'current_month': this_month,
 		'calendars': Calendar.objects.filter(approved=True).order_by('event_calendar'),
-		'shown_calendars': return_calendars(request, 'shown_calendars'),
-		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
 		'locations': Location.objects.filter(approved=True).order_by('location'),
 	})
 
 def calendarDayView(request, year, month, day):
-	delete_unapproved_events_after_4_days()
+	handle_deleting_of_copied_and_unapproved_events()
+	handle_calendar_display(request)
 	this_year = get_object_or_404(Year, year=year)
 	this_month = get_object_or_404(Month, year=this_year, month=month)
 	this_day = get_object_or_404(Day, month=this_month, day_of_month=day)
@@ -176,7 +182,25 @@ def calendarDayView(request, year, month, day):
 		'first_day_of_week': first_day_of_week,
 		'current_month': this_month,
 		'calendars': Calendar.objects.filter(approved=True).order_by('event_calendar'),
-		'shown_calendars': return_calendars(request, 'shown_calendars'),
-		'hidden_calendars': return_calendars(request, 'hidden_calendars'),
 		'locations': Location.objects.filter(approved=True).order_by('location'),
 	})
+
+def ajax_show_hide_calendars(request):
+	shown_calendar_pks = dict(request.GET.lists()).get('shown_calendar_pks[]', None)
+	if shown_calendar_pks:
+		shown_calendar_pks = [int(x) for x in shown_calendar_pks]
+		hidden_calendar_pks = [x.pk for x in Calendar.objects.exclude(pk__in=shown_calendar_pks)]
+	else:
+		shown_calendar_pks = []
+		hidden_calendar_pks = [x.pk for x in Calendar.objects.all()]
+	if request.user.is_authenticated:
+		for calendar in request.user.member.calendar_preferences.all():
+			request.user.member.calendar_preferences.remove(calendar)		
+		for calendar in Calendar.objects.filter(pk__in=shown_calendar_pks):
+			request.user.member.calendar_preferences.add(calendar)
+	request.session['shown_calendar_pks'] = shown_calendar_pks
+	request.session['hidden_calendar_pks'] = hidden_calendar_pks
+	data = {
+		'hidden_calendar_pks': hidden_calendar_pks
+	}
+	return JsonResponse(data)

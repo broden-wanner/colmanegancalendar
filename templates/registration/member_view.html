@@ -10,7 +10,7 @@
 <div class="container">
 <div class="row">
 	<h1>{{ user.username }} Account Info</h1>
-	<div class="col-sm-3" id="user-info">
+	<div class="col-md-3" id="user-info">
 		<p><span class="user-label">First Name:</span> {{ user.first_name }}</p>
 		<p><span class="user-label">Last Name:</span> {{ user.last_name }}</p>
 		<p><span class="user-label">Email:</span> {{ user.email }}</p>
@@ -34,7 +34,7 @@
 		</div>
 	</div>
 
-	<div class="col-sm-9">
+	<div class="col-md-9">
 		<p class="calendar-label">Pending Events:</p>
 		<table class="table table-bordered event-table">
 			{% if not pending_events %}
