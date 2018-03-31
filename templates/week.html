@@ -32,7 +32,7 @@
 						<div>
 							<ul>
 								{% for event in day.sorted_events %}
-									<li data-calendar-pk="{{ event.calendar.pk }}" {% if event.all_day or event.start_date.day != event.end_date.day %}style="background-color: {{ event.calendar.color }};" class="all-or-multi-day-event" {% else %} class="one-day-event" {% endif %}>
+									<li data-calendar-pk="{{ event.calendar.pk }}" {% if event.all_day or event.start_date.day != event.end_date.day %}style="display: none; background-color: {{ event.calendar.color }};" class="all-or-multi-day-event" {% else %} class="one-day-event" {% endif %} style="display: none;">
 										{% if not event.all_day and event.start_date.day == event.end_date.day%}
 											<span class="bullet" style="background-color: {{ event.calendar.color }};"></span>
 										{% endif %}
