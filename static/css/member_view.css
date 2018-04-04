@@ -1,3 +1,4 @@
+/* Shrink header size */
 h1 {
 	font-size: 5em;
 }
@@ -6,13 +7,18 @@ h1 {
 	font-size: 1.2em;
 }
 
-.event-table {
+.event-table, .calendar-table, .location-table {
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-.event-table tr[data-calendar-pk] td {
+.event-table tr[data-event-pk] td, .calendar-table tr[data-calendar-pk] td {
 	border: 3px solid white;
 	color: white;
+	text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.location-table tr[data-location-pk] td {
+	color: black;
 	text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -34,7 +40,7 @@ h1 {
 }
 
 /* Sets hover settings for event rows */
-.event-table tr[data-calendar-pk]:hover {
+.event-table tr[data-event-pk]:hover, .calendar-table tr[data-calendar-pk]:hover, .location-table tr[data-location-pk]:hover {
 	cursor: pointer;
 	background-color: rgba(0, 0, 0, 0.2) !important;
 }
@@ -53,4 +59,9 @@ h1 {
 /* Sets height of rows */
 .time-column, .title-column, .event-info-column {
 	height: 5%;
+}
+
+/* Add space after nav tab menu */
+ul.nav.nav-tabs {
+	margin-bottom: 1.5em;
 }

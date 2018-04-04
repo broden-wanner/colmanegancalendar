@@ -92,6 +92,10 @@
 					     </li>
 					{% endif %}
 				{% endif %}
+				{# Displays the pending events page for admins #}
+				{% if request.user|in_group:"Admins" %}
+					<li><a href="{% url 'pending_events' %}">Pending Events</a></li>
+				{% endif %}
 				{# Displays the login/signup/logout links when appropriate #}
 		  		{% if request.path != '/accounts/login/' or request.path != '/accounts/signup/' %}
 					{% if user.is_authenticated %}

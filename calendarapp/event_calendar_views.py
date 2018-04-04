@@ -1,13 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User, Group
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from django.utils import timezone
-import datetime
-import time
 from django.template.loader import render_to_string
-from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
-from .forms import EventForm, CalendarForm, MemberCreationForm, MemberChangeForm, ReasonForCalendarRejectForm
+from .models import Calendar, Event
+from .forms import CalendarForm, ReasonForm
 from .calendar_views import handle_deleting_of_copied_and_unapproved_events
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -39,14 +37,11 @@ def newCalendarView(request):
 					'domain': current_site.domain,
 					'calendar': new_calendar,
 				}
-				text_message = render_to_string('email/approve_calendar_email.html', content)
-				html_message = render_to_string('email/approve_calendar_html_email.html', content)
+				message = render_to_string('email/approve_calendar_email.html', content)
 				recipient_list = []
 				for admin in User.objects.filter(groups__name='Admins'):
 					recipient_list.append(admin.email)
-				msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, recipient_list)
-				msg.attach_alternative(html_message, 'text/html')
-				msg.send()
+				send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
 				return redirect('calendar_approval_sent', slug=new_calendar.slug)
 	else:
 		new_calendar_form = CalendarForm()
@@ -55,7 +50,7 @@ def newCalendarView(request):
 
 @login_required
 def calendar_approval_sent(request, slug):
-	return render(request, 'approve/calendar_approval_sent.html')
+	return render(request, 'approve/message.html', {'message': 'Your calendar is pending Admin approval.'})
 
 @login_required
 def approve_calendar(request, slug):
@@ -65,52 +60,49 @@ def approve_calendar(request, slug):
 		if calendar.approved == False:
 			calendar.approved = True
 			calendar.save()
-			current_site = get_current_site(request)
 			subject = f'Calendar Approved: {calendar.event_calendar}'
-			content = {'calendar': calendar}
-			text_message = render_to_string('email/calendar_approved_email.html', content)
-			html_message = render_to_string('email/calendar_approved_html_email.html', content)
-			msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, [calendar.creator.email])
-			msg.attach_alternative(html_message, 'text/html')
-			msg.send()
+			content = {
+				'calendar': calendar,
+				'greeting': f'Hi, {calendar.creator.username}. The following calendar has been approved:',
+			}
+			message = render_to_string('email/calendar_email.html', content)
+			send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [calendar.creator.email])
 			return redirect('home')
 		#If already approved, don't send email and tell user that it is already approved
 		else:
-			return render(request, 'approve/calendar_already_approved.html')
+			return render(request, 'approve/message.html', {'message': 'Your calendar has already been approved.'})
 	else:
-		return render(request, 'approve/calendar_approval_error.html')
+		return render(request, 'approve/message.html', {'message': 'There was an error in approving the calendar. Be sure you are logged in as an Admin and click the link in the email again.'})
 
 @login_required
 def reject_calendar(request, slug):
 	if Group.objects.get(name='Admins') in request.user.groups.all():
 		if request.method == 'POST':
-			reason_form = ReasonForCalendarRejectForm(request.POST)
+			reason_form = ReasonForm(request.POST, label='Reason for rejecting the calendar:')
 			if reason_form.is_valid():
 				try:
 					calendar = Calendar.objects.get(slug=slug)
 				except Calendar.DoesNotExist:
-					return render(request, 'approve/calendar_already_rejected.html')
+					return render(request, 'approve/message.html', {'message': 'This calendar has already been rejected.'})
 				#Don't delete if the calendar is approved
 				if calendar.approved:
-					return render(request, 'approve/calendar_already_approved.html')
+					return render(request, 'approve/message.html', {'message': 'This calendar has already been approved.'})
 				#Send an email to the user if their email is confirmed to tell them about the calendar
 				reason = reason_form.cleaned_data.get('reason')
 				subject = f'Calendar Rejected: {calendar.event_calendar}'
 				content = {
 					'calendar': calendar,
 					'reason': reason,
+					'greeting': f'Hi, {calendar.creator.username}. The following calendar has been rejected for the following reason:',
 				}
-				text_message = render_to_string('email/calendar_rejected_email.html', content)
-				html_message = render_to_string('email/calendar_rejected_html_email.html', content)
-				msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, [calendar.creator.email])
-				msg.attach_alternative(html_message, 'text/html')
-				msg.send()
+				message = render_to_string('email/calendar_email.html', content)
+				send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [calendar.creator.email])
 				calendar.delete()
 				return redirect('home')
 		else:
-			reason_form = ReasonForCalendarRejectForm()
+			reason_form = ReasonForm(label='Reason for rejecting the calendar:')
 			return render(request, 'approve/reason_for_reject.html', {'reason_form': reason_form})
-	return render(request, 'approve/calendar_approval_error.html')
+	return render(request, 'approve/message.html', {'message': 'There was an error in approving the calendar. Be sure you are logged in as an Admin and click the link in the email again.'})
 
 @login_required
 def editCalendarView(request, slug):
@@ -135,7 +127,7 @@ def deleteCalendarView(request, slug):
 		calendar = get_object_or_404(Calendar, slug=slug)
 		if request.method == "POST":
 			calendar.delete()
-			return redirect('month', year=timezone.now().year, month=timezone.now().month)
+			return redirect('home')
 		return render(request, 'delete_calendar.html', {'calendar': calendar})
 	else:
 		return render(request, 'not_allowed.html')

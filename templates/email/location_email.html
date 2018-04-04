@@ -1,5 +1,10 @@
 {% autoescape off %}
-Hi, {{ location.creator.username }}. The following location has been approved:
+{{ greeting }}
+
+{% if reason %}
+Reason:
+{{ reason }}
+{% endif %}
 
 Location name: {{ location.location }}
 {% endautoescape %}

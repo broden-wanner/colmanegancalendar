@@ -159,6 +159,7 @@ class Event(models.Model):
 	approved = models.BooleanField(default=False)
 	creator = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, related_name='creator')
 	editor = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='editor')
+	deleter = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='deleter')
 	event_info = models.TextField(blank=True)
 	calendar = models.ForeignKey('Calendar', on_delete=models.CASCADE)
 	location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, blank=True)
@@ -170,6 +171,8 @@ class Event(models.Model):
 	all_day = models.BooleanField(default=False)
 	date_created = models.DateTimeField(default=timezone.now)
 	edited_time = models.DateTimeField(default=timezone.now)
+	#If the event is edited, have the original event
+	original_event = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
 	#Repeating fields
 	repeat = models.BooleanField(default=False)
 	repeat_every = models.PositiveIntegerField(default=1, blank=True, null=True)

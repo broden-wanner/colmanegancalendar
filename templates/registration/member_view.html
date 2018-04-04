@@ -36,84 +36,182 @@
 	</div>
 
 	<div class="col-md-9">
-		{% if not request.user|in_group:'Admins' %}
-		<p class="calendar-label">Pending Events:</p>
-		<table class="table table-bordered event-table">
-			{% if not pending_events %}
-			<tr>
-				<td>You have no pending events.</td>
-			</tr>
-			{% else %}
-				{% for event in pending_events %}
-					<tr data-calendar-pk="{{ event.calendar.pk }}" style="background-color: {{ event.calendar.color }};">
-						<td class="title-column">
-							{{ event.title }}
-						</td>
-						<td class="time-column">
-							<a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}"></a>
-							{% if event.all_day and event.start_date == event.end_date %}
-								{{ event.start_date }} (all-day)
-							{% elif event.all_day and event.start_date != event.end_date %}
-								{{ event.start_date }} - {{ event.end_date }} (all-day)
-							{% else %}
-								{{ event.start_date }}, {{ event.start_time }} &mdash; {{ event.end_date }}, {{ event.end_time }}
-							{% endif %}
-						</td>
-						<td class="event-info-column">
-							{% if event.event_info %}
-								{{ event.event_info }}
-							{% else %}
-								No event info
-							{% endif %}
-						</td>
-					</tr>
-				{% endfor %}
+		{# Menu tabs #}
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="#events-panel">Events</a></li>
+			<li><a href="#calendar-panel">Calendars</a></li>
+			<li><a href="#location-panel">Locations</a></li>
+		</ul>
+		<div id="events-panel">
+			{% if not request.user|in_group:'Admins' %}
+			<p class="calendar-label">Pending Events:</p>
+			<table class="table table-bordered event-table">
+				{% if not pending_events %}
+				<tr>
+					<td>You have no pending events.</td>
+				</tr>
+				{% else %}
+					{% for event in pending_events %}
+						<tr data-event-pk="{{ event.pk }}" style="background-color: {{ event.calendar.color }};">
+							<td class="title-column">
+								{{ event.title }}
+							</td>
+							<td class="time-column">
+								<a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}"></a>
+								{% if event.all_day and event.start_date == event.end_date %}
+									{{ event.start_date }} (all-day)
+								{% elif event.all_day and event.start_date != event.end_date %}
+									{{ event.start_date }} - {{ event.end_date }} (all-day)
+								{% else %}
+									{{ event.start_date }}, {{ event.start_time }} &mdash; {{ event.end_date }}, {{ event.end_time }}
+								{% endif %}
+							</td>
+							<td class="event-info-column">
+								{% if event.event_info %}
+									{{ event.event_info }}
+								{% else %}
+									No event info
+								{% endif %}
+							</td>
+						</tr>
+					{% endfor %}
+				{% endif %}
+			</table>
 			{% endif %}
-		</table>
-		{% endif %}
 
-		<p class="calendar-label">Created and Approved Events:</p>
-		<table class="table table-bordered event-table">
-			{% if not created_events %}
-			<tr>
-				<td>You have not created or approved any events</td>
-			</tr>
-			{% else %}
-				{% for event in created_events %}
-					<tr data-calendar-pk="{{ event.calendar.pk }}" style="background-color: {{ event.calendar.color }};">
-						<td class="title-column">
-							{{ event.title }}
-						</td>
-						<td class="time-column">
-							<a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}"></a>
-							{% if event.all_day and event.start_date == event.end_date %}
-								{{ event.start_date }} (all-day)
-							{% elif event.all_day and event.start_date != event.end_date %}
-								{{ event.start_date }} - {{ event.end_date }} (all-day)
-							{% else %}
-								{{ event.start_date }}, {{ event.start_time }} &mdash; {{ event.end_date }}, {{ event.end_time }}
-							{% endif %}
-						</td>
-						<td class="event-info-column">
-							{% if event.event_info %}
-								{{ event.event_info }}
-							{% else %}
-								No event info
-							{% endif %}
-						</td>
+			<p class="calendar-label">Created and Approved Events:</p>
+			<table class="table table-bordered event-table">
+				{% if not created_events %}
+				<tr>
+					<td>You have not created or approved any events</td>
+				</tr>
+				{% else %}
+					{% for event in created_events %}
+						<tr data-event-pk="{{ event.pk }}" style="background-color: {{ event.calendar.color }};">
+							<td class="title-column">
+								{{ event.title }}
+							</td>
+							<td class="time-column">
+								<a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}"></a>
+								{% if event.all_day and event.start_date == event.end_date %}
+									{{ event.start_date }} (all-day)
+								{% elif event.all_day and event.start_date != event.end_date %}
+									{{ event.start_date }} - {{ event.end_date }} (all-day)
+								{% else %}
+									{{ event.start_date }}, {{ event.start_time }} &mdash; {{ event.end_date }}, {{ event.end_time }}
+								{% endif %}
+							</td>
+							<td class="event-info-column">
+								{% if event.event_info %}
+									{{ event.event_info }}
+								{% else %}
+									No event info
+								{% endif %}
+							</td>
+						</tr>
+					{% endfor %}
+				{% endif %}
+			</table>
+		</div>
+
+		<div id="calendar-panel" style="display: none;">
+			{% if not request.user|in_group:'Admins' %}
+				<p class="calendar-label">Pending Calendars:</p>
+				<table class="table table-bordered calendar-table">
+					{% if not pending_calendars %}
+					<tr>
+						<td>You have no pending calendars.</td>
 					</tr>
-				{% endfor %}
+					{% else %}
+						{% for calendar in pending_calendars %}
+							<tr data-calendar-pk="{{ calendar.pk }}" style="background-color: {{ calendar.color }};">
+								<td class="calendar-title-column">
+									<a href="{% url 'calendar_view' slug=calendar.slug %}"></a>
+									{{ calendar.event_calendar }}
+								</td>
+							</tr>
+						{% endfor %}
+					{% endif %}
+				</table>
 			{% endif %}
-		</table>
+			<p class="calendar-label">Created and Approved Calendars:</p>
+			<table class="table table-bordered calendar-table">
+				{% if not created_calendars %}
+				<tr>
+					<td>You have not created or approved any calendars</td>
+				</tr>
+				{% else %}
+					{% for calendar in created_calendars %}
+						<tr data-calendar-pk="{{ calendar.pk }}" style="background-color: {{ calendar.color }};">
+							<td class="calendar-title-column">
+								<a href="{% url 'calendar_view' slug=calendar.slug %}"></a>
+								{{ calendar.event_calendar }}
+							</td>
+						</tr>
+					{% endfor %}
+				{% endif %}
+			</table>
+		</div>
+
+		<div id="location-panel" style="display: none;">
+			{% if not request.user|in_group:'Admins' %}
+				<p class="calendar-label">Pending Locations:</p>
+				<table class="table table-bordered location-table">
+					{% if not pending_locations %}
+					<tr>
+						<td>You have no pending locations</td>
+					</tr>
+					{% else %}
+						{% for location in pending_locations %}
+							<tr data-location-pk="{{ location.pk }}">
+								<td class="location-title-column">
+									<a href="{% url 'location_view' slug=location.slug %}"></a>
+									{{ location.location }}
+								</td>
+							</tr>
+						{% endfor %}
+					{% endif %}
+				</table>
+			{% endif %}
+			<p class="calendar-label">Created and Approved Locations:</p>
+			<table class="table table-bordered location-table">
+				{% if not created_locations %}
+				<tr>
+					<td>You have not created or approved any locations</td>
+				</tr>
+				{% else %}
+					{% for location in created_locations %}
+						<tr data-location-pk="{{ location.pk }}">
+							<td class="location-title-column">
+								<a href="{% url 'location_view' slug=location.slug %}"></a>
+								{{ location.location }}
+							</td>
+						</tr>
+					{% endfor %}
+				{% endif %}
+			</table>
+		</div>
 	</div>
 
 </div>
 </div>
 
 <script type="text/javascript">
-//Allows users to click entire row to navigate to event
-$('tr[data-calendar-pk]').click( function() {
+{# Allows users to click entire row to navigate to event #}
+$('tr[data-event-pk], tr[data-calendar-pk], tr[data-location-pk]').click( function() {
 	window.location = $(this).find('a').attr('href');
+});
+{# Controls tabbing of the views #}
+$("ul.nav.nav-tabs li a").click(function (e) {
+	e.preventDefault();
+	$("ul li").removeClass("active");
+    var related = $(this).attr("href");
+    $(this).parent().addClass("active");
+    if ($(this).parent().hasClass("active")) {
+        $("div.col-md-9 > div").hide();
+        console.log(related);
+        $(related).show();
+    }
 });
 </script>
 

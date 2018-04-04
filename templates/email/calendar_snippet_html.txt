@@ -1,5 +1,0 @@
-<h1>{{ calendar.event_calendar }}</h1>
-
-<p>Color: <span style="background-color: {{ calendar.color }}; width: 20px;"></span></p>
-
-<p>Default Calendar: {{ calendar.default_calendar|yesno:'Yes, No' }}</p>

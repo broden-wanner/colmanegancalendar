@@ -26,8 +26,10 @@ urlpatterns += [
 	path('event/approve-change/<int:original_pk>/<slug:original_slug>/<int:changed_pk>/<slug:changed_slug>/', event_views.approve_event_change, name='approve_event_change'),
 	path('event/reject-change/<int:original_pk>/<slug:original_slug>/<int:changed_pk>/<slug:changed_slug>/', event_views.reject_event_change, name='reject_event_change'),
 	path('event/deletion-request-sent/<int:pk>/<slug:slug>/', event_views.event_deletion_request_sent, name='event_deletion_request_sent'),
-	path('event/approve-delete/<int:pk>/<slug:slug>/<int:deleting_user_pk>/', event_views.approve_event_delete, name='approve_event_delete'),
-	path('event/reject-delete/<int:pk>/<slug:slug>/<int:deleting_user_pk>/', event_views.reject_event_delete, name='reject_event_delete'),
+	path('event/approve-delete/<int:pk>/<slug:slug>/', event_views.approve_event_delete, name='approve_event_delete'),
+	path('event/reject-delete/<int:pk>/<slug:slug>/', event_views.reject_event_delete, name='reject_event_delete'),
+	path('event/pending-events/', event_views.pending_events, name='pending_events'),
+	path('event/ajax_pending_events/', event_views.ajax_pending_events, name='ajax_pending_events'),
 ]
 
 #Calendar Views
@@ -55,7 +57,7 @@ urlpatterns += [
 #Account Views
 urlpatterns += [
 	path('accounts/signup/', account_views.signup, name='signup'),
-	path('accounts/<str:username>/view/', account_views.member_view, name='member_view'),
+	path('accounts/<str:username>/', account_views.member_view, name='member_view'),
 	path('accounts/account-activation-sent/', account_views.account_activation_sent, name='account_activation_sent'),
 	path('accounts/activate/<str:uidb64>/<str:token>/', account_views.activate, name='activate'),
 	path('accounts/<str:username>/edit/', account_views.edit_member_info, name='edit_member_info'),

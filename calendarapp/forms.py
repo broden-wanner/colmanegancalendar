@@ -13,7 +13,7 @@ class EventForm(forms.ModelForm):
 		required=False
 	)
 	calendar = forms.ModelChoiceField(
-		queryset=Calendar.objects.all().order_by('event_calendar'),
+		queryset=Calendar.objects.filter(approved=True).order_by('event_calendar'),
 		widget=forms.Select(attrs={'class': 'form-control'})
 	)
 	location = forms.ModelChoiceField(
@@ -91,47 +91,16 @@ class EventForm(forms.ModelForm):
 		if repeat and duration == '2' and not repeat_on:
 			self.add_error('repeat_on', 'If repeating weekly, this field must be filled')
 
-class ReasonForEventEditForm(forms.Form):
+class ReasonForm(forms.Form):
 	reason = forms.CharField(
 		required=False,
-		label='Reason for editing the event:',
 		widget=forms.TextInput(attrs={'class': 'form-control'})
 	)
 
-class ReasonForEventRejectForm(forms.Form):
-	reason = forms.CharField(
-		required=False,
-		label='Reason for rejecting the event:',
-		widget=forms.TextInput(attrs={'class': 'form-control'})
-	)
-
-class ReasonForEventDeleteForm(forms.Form):
-	reason = forms.CharField(
-		required=False,
-		label='Reason for deleting the event:',
-		widget=forms.TextInput(attrs={'class': 'form-control'})
-	)
-
-class ReasonForEventDeleteRejectForm(forms.Form):
-	reason = forms.CharField(
-		required=False,
-		label='Reason for not deleting the event:',
-		widget=forms.TextInput(attrs={'class': 'form-control'})
-	)
-
-class ReasonForCalendarRejectForm(forms.Form):
-	reason = forms.CharField(
-		required=False,
-		label='Reason for rejecting the calendar:',
-		widget=forms.TextInput(attrs={'class': 'form-control'})
-	)
-
-class ReasonForLocationRejectForm(forms.Form):
-	reason = forms.CharField(
-		required=False,
-		label='Reason for rejecting the location:',
-		widget=forms.TextInput(attrs={'class': 'form-control'})
-	)	
+	def __init__(self, *args, **kwargs):
+		reason_label = kwargs.pop('label')
+		super(ReasonForm, self).__init__(*args, **kwargs)
+		self.fields['reason'].label = reason_label
 
 class CalendarForm(forms.ModelForm):
 

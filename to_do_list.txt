@@ -1,3 +1,5 @@
+2. Add location/calendar approval/pending views for admins and users
+
 3. Admin
 	-Allow admins to see all pending events and approve them from the page
 	-Pass in a form with check boxes to delete the checked ones

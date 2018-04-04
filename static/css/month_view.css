@@ -25,7 +25,7 @@
 }
 
 /* Remove scroll bar for calendar days */
-::-webkit-scrollbar {
+#month-table ::-webkit-scrollbar {
     width: 0px;
     background: transparent;
 }
@@ -76,12 +76,6 @@
 
 /* Creates today circle for day */
 a.today-number, a.today-number:hover {
-	background: #F5A719;
-	height: 1.5em;
-	width: 1.5em;
-	text-align: center;
-	color: white;
-	border-radius: 50%;
-	display: inline-block;
-	margin: 0 0 -0.5em 0;
+	color: #F5A719;
+	font-weight: bold;
 } 

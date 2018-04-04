@@ -17,8 +17,8 @@ There are no event conflicts.
 {% endif %}
 
 Click the link below to delete the event:
-http://{{ domain }}{% url 'approve_event_delete' slug=event.slug pk=event.pk deleting_user_pk=user.pk %}
+http://{{ domain }}{% url 'approve_event_delete' slug=event.slug pk=event.pk %}
 
 Click the link below to deny the deletion of the event:
-http://{{ domain }}{% url 'reject_event_delete' slug=event.slug pk=event.pk deleting_user_pk=user.pk %}
+http://{{ domain }}{% url 'reject_event_delete' slug=event.slug pk=event.pk %}
 {% endautoescape %}

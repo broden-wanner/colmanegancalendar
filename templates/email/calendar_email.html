@@ -1,9 +1,13 @@
 {% autoescape off %}
-Hi, {{ calendar.creator.username }}. The following calendar has been rejected because of the following reason.
+{{ greeting }}
 
+{% if reason %}
 Reason:
 {{ reason }}
+{% endif %}
 
 Calendar:
+
 {% include 'email/calendar_snippet_raw_text.txt' %}
+
 {% endautoescape %}

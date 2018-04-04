@@ -1,10 +1,6 @@
-/*Adds margin on top for navbar */
+/*Adds margin on top for navbar and sets body font */
 body {
 	margin-top: 50px;
-}
-
-/* Sets body font */
-* {
 	font-family: 'Arimo', sans-serif;
 }
 

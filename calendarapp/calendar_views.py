@@ -1,11 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth.models import Group
-import json
 from django.http import JsonResponse
 from django.utils import timezone
 import datetime
-import time
-from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
+from .models import Year, Month, Day, Calendar, Event, Location
 
 def handle_calendar_display(request):
 	#Determines calendars to hide if not in the session (upon the user first navigating to the site)
@@ -186,13 +184,16 @@ def calendarDayView(request, year, month, day):
 	})
 
 def ajax_show_hide_calendars(request):
-	shown_calendar_pks = dict(request.GET.lists()).get('shown_calendar_pks[]', None)
-	if shown_calendar_pks:
-		shown_calendar_pks = [int(x) for x in shown_calendar_pks]
-		hidden_calendar_pks = [x.pk for x in Calendar.objects.exclude(pk__in=shown_calendar_pks)]
+	if request.is_ajax():
+		shown_calendar_pks = dict(request.GET.lists()).get('shown_calendar_pks[]', None)
+		if shown_calendar_pks:
+			shown_calendar_pks = [int(x) for x in shown_calendar_pks]
+			hidden_calendar_pks = [x.pk for x in Calendar.objects.exclude(pk__in=shown_calendar_pks)]
+		else:
+			shown_calendar_pks = []
+			hidden_calendar_pks = [x.pk for x in Calendar.objects.all()]
+		request.session['shown_calendar_pks'] = shown_calendar_pks
+		request.session['hidden_calendar_pks'] = hidden_calendar_pks
+		return JsonResponse({'done': True})
 	else:
-		shown_calendar_pks = []
-		hidden_calendar_pks = [x.pk for x in Calendar.objects.all()]
-	request.session['shown_calendar_pks'] = shown_calendar_pks
-	request.session['hidden_calendar_pks'] = hidden_calendar_pks
-	return JsonResponse({'done': True})
+		return JsonResponse({'message': "You can't do that"})

@@ -3,15 +3,12 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User, Group
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
-from django.utils import timezone
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-import datetime
-import time
 from django.template.loader import render_to_string
 from .tokens import account_activation_token
-from .models import Year, Month, Day, Calendar, Event, Location, DayOfWeek
-from .forms import EventForm, CalendarForm, MemberCreationForm, MemberChangeForm
+from .models import Calendar, Event, Location
+from .forms import MemberCreationForm, MemberChangeForm
 from .calendar_views import handle_deleting_of_copied_and_unapproved_events
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -49,7 +46,18 @@ def member_view(request, username):
 		return redirect('home')
 	created_events = Event.objects.filter(creator=request.user, approved=True).order_by('start_date', 'start_time')
 	pending_events = Event.objects.filter(creator=request.user, approved=False).order_by('start_date', 'start_time')
-	return render(request, 'registration/member_view.html', {'created_events': created_events, 'pending_events': pending_events})
+	created_calendars = Calendar.objects.filter(creator=request.user, approved=True).order_by('event_calendar')
+	pending_calendars = Calendar.objects.filter(creator=request.user, approved=False).order_by('event_calendar')
+	created_locations = Location.objects.filter(creator=request.user, approved=True).order_by('location')
+	pending_locations = Location.objects.filter(creator=request.user, approved=False).order_by('location')
+	return render(request, 'registration/member_view.html', {
+		'created_events': created_events,
+		'pending_events': pending_events,
+		'created_calendars': created_calendars,
+		'pending_calendars': pending_calendars,
+		'created_locations': created_locations,
+		'pending_locations': pending_locations,
+	})
 
 def account_activation_sent(request):
 	return render(request, 'registration/account_activation_sent.html')
