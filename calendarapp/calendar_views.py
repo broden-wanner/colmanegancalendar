@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib.auth.models import Group
 from django.http import JsonResponse
 from django.utils import timezone
@@ -32,6 +33,7 @@ def handle_deleting_of_copied_and_unapproved_events():
 		elif event.edited_time + datetime.timedelta(days=4) < timezone.now():
 			event.delete()
 
+@xframe_options_exempt
 def calendarHomeView(request):
 	handle_deleting_of_copied_and_unapproved_events()
 	handle_calendar_display(request)
@@ -47,6 +49,7 @@ def calendarHomeView(request):
 	else:
 		return redirect('month', year=timezone.now().year, month=timezone.now().month)
 
+@xframe_options_exempt
 def calendarMonthView(request, year, month):
 	handle_deleting_of_copied_and_unapproved_events()
 	handle_calendar_display(request)
@@ -125,6 +128,7 @@ def calendarMonthView(request, year, month):
 		'first_day_of_week': first_day_of_week,
 	})
 
+@xframe_options_exempt
 def calendarWeekView(request, year, month, first_day_of_week):
 	handle_deleting_of_copied_and_unapproved_events()
 	handle_calendar_display(request)
@@ -154,6 +158,7 @@ def calendarWeekView(request, year, month, first_day_of_week):
 		'locations': Location.objects.filter(approved=True).order_by('location'),
 	})
 
+@xframe_options_exempt
 def calendarDayView(request, year, month, day):
 	handle_deleting_of_copied_and_unapproved_events()
 	handle_calendar_display(request)
@@ -183,6 +188,7 @@ def calendarDayView(request, year, month, day):
 		'locations': Location.objects.filter(approved=True).order_by('location'),
 	})
 
+@xframe_options_exempt
 def ajax_show_hide_calendars(request):
 	if request.is_ajax():
 		shown_calendar_pks = dict(request.GET.lists()).get('shown_calendar_pks[]', None)
