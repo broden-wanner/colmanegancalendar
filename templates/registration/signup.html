@@ -6,6 +6,10 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/account_create_edit.css'%}">
 {% endblock %}
 
+{% block js %}
+<script src='https://www.google.com/recaptcha/api.js'></script>
+{% endblock %}
+
 {% block content %}
 <div class="container">
 	<div class="row">
@@ -22,6 +26,8 @@
 						{% endif %}
 					</div>
 				{% endfor %}
+				<div class="g-recaptcha" data-sitekey="6LfRjFcUAAAAAMLEXvpZfavfkLQxq14DBgww-Faz"></div>
+				<br>
 				<button class="btn" type="submit" value="sign_up">Sign up</button>
 			</form>
 			<br>

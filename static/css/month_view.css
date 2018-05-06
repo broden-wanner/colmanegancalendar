@@ -16,7 +16,7 @@
     padding-right: 0 !important;
 }
 
-#month-table td > div {
+#month-table td > div, #month-table td > div:empty {
 	overflow-y: auto;
 	overflow-x: hidden;
 	white-space: nowrap;
@@ -61,12 +61,22 @@
 .all-or-multi-day-event {
 	width: 100%;
 }
+.all-or-multi-day-event:hover {
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 -6px 20px 0 rgba(0, 0, 0, 0.19);
+	padding: 0.2em 0.2em 0.2em 0;
+}
 .all-or-multi-day-event > a {
 	color: white;
 	margin-left: 0.5em;
 }
 .one-day-event {
 	margin-left: 0.5em;
+}
+.one-day-event:hover {
+	margin-left: 0;
+	background: rgba(255, 255, 255, 0.1);
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	padding: 0.2em 0.2em 0.2em 0.5em;
 }
 
 /* Sets the spacing for the number on the calendar */

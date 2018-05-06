@@ -129,3 +129,11 @@ def delete_location(request, slug):
 		return render(request, 'delete_location.html', {'location': location})
 	else:
 		return render(request, 'not_allowed.html')
+
+@login_required
+def pending_locations(request):
+	if Group.objects.get(name='Admins') in request.user.groups.all():
+		pending_locations = Location.objects.filter(approved=False)
+		return render(request, 'pending_locations.html', {'pending_locations': pending_locations})
+	else:
+		return render(request, 'not_allowed.html')

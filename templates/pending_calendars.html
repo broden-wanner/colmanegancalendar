@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/pending.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<h1>Pending Calendars:</h1>
+	{% if pending_calendars %}
+		<table class="table table-bordered pending-table">
+			<tr>
+				<th>Title</th>
+				<th>Approve</th>
+				<th>Delete</th>
+			</tr>
+			{% for calendar in pending_calendars %}
+			<tr data-calendar-pk="{{ calendar.pk }}" style="background-color: {{ calendar.color }};">
+				<td>
+					{{ calendar.event_calendar }}
+				</td>
+				<td class="approve-column">
+					<input type="checkbox" name="approve-pending-calendars" value="{{ calendar.pk }}" id="pending-calendar-{{ calendar.pk }}">
+				</td>
+				<td class="delete-column">
+					<input type="checkbox" name="delete-pending-calendars" value="{{ calendar.pk }}" id="pending-calendar-{{ calendar.pk }}">
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+		<p>None</p>
+	{% endif %}
+	<br>
+	<button id="calendar-change-submit" type="submit" class="btn btn-default">Submit Changes</button>
+	<div style="display: none;" id="overlay">
+		<div style="display: none;" id="delete-reason-form">
+			<span class="glyphicon glyphicon-remove"></span>
+			<h2>Please enter the reason for deleting the following calendars:</h2>
+			<button id="delete-reason-submit" type="submit" class="btn btn-default">Submit Reasons</button>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+{# Control the checking and unchecking of the approval and delete boxes #}
+$(".approve-column input").change(function () {
+	$(this).each(function () {
+		$(this).parent().next().find('input').prop('checked', false);
+	});
+});
+$(".delete-column input").change(function () {
+	$(this).each(function () {
+		$(this).parent().prev().find('input').prop('checked', false);
+	});
+});
+
+</script>
+
+{% endblock %}

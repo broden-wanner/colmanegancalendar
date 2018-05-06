@@ -6,18 +6,16 @@ from django.utils import timezone
 from django.template.loader import render_to_string
 from .models import Calendar, Event
 from .forms import CalendarForm, ReasonForm
-from .calendar_views import handle_deleting_of_copied_and_unapproved_events
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
-def calendarView(request, slug):
-	handle_deleting_of_copied_and_unapproved_events()
+def calendar_view(request, slug):
 	calendar = get_object_or_404(Calendar, slug=slug)
 	events = Event.objects.filter(approved=True, calendar=calendar, end_date__gte=timezone.localtime().date()).order_by('start_date', 'start_time')
 	return render(request, 'calendar_view.html', {'calendar': calendar, 'events': events})
 
 @login_required
-def newCalendarView(request):
+def new_calendar(request):
 	if request.method == 'POST':
 		new_calendar_form = CalendarForm(request.POST)
 		if new_calendar_form.is_valid():
@@ -105,7 +103,7 @@ def reject_calendar(request, slug):
 	return render(request, 'approve/message.html', {'message': 'There was an error in approving the calendar. Be sure you are logged in as an Admin and click the link in the email again.'})
 
 @login_required
-def editCalendarView(request, slug):
+def edit_calendar(request, slug):
 	if Group.objects.get(name='Admins') in request.user.groups.all():
 		calendar = get_object_or_404(Calendar, slug=slug)
 		if request.method == "POST":
@@ -122,12 +120,20 @@ def editCalendarView(request, slug):
 		return render(request, 'not_allowed.html')
 
 @login_required
-def deleteCalendarView(request, slug):
+def delete_calendar(request, slug):
 	if Group.objects.get(name='Admins') in request.user.groups.all():
 		calendar = get_object_or_404(Calendar, slug=slug)
 		if request.method == "POST":
 			calendar.delete()
 			return redirect('home')
 		return render(request, 'delete_calendar.html', {'calendar': calendar})
+	else:
+		return render(request, 'not_allowed.html')
+
+@login_required
+def pending_calendars(request):
+	if Group.objects.get(name='Admins') in request.user.groups.all():
+		pending_calendars = Calendar.objects.filter(approved=False)
+		return render(request, 'pending_calendars.html', {'pending_calendars': pending_calendars})
 	else:
 		return render(request, 'not_allowed.html')

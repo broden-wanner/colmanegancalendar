@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/pending.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<h1>Pending Locations:</h1>
+	{% if pending_locations %}
+		<table class="table table-bordered pending-table">
+			<tr>
+				<th>Title</th>
+				<th>Approve</th>
+				<th>Delete</th>
+			</tr>
+			{% for location in pending_locations %}
+			<tr data-location-pk="{{ location.pk }}">
+				<td>
+					<a href="{% url 'location_view' slug=location.slug %}">{{ location.location }}</a>
+				</td>
+				<td>
+					<input type="checkbox" name="approve-pending-locations" value="{{ location.pk }}" id="pending-location-{{ location.pk }}">
+				</td>
+				<td>
+					<input type="checkbox" name="delete-pending-locations" value="{{ location.pk }}" id="pending-location-{{ location.pk }}">
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+		<p>None</p>
+	{% endif %}
+</div>
+{% endblock %}

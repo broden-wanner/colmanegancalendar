@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.clickjacking import xframe_options_exempt #A decorator to remove x-frame same origin in iframes
 from django.contrib.auth.models import Group
 from django.http import JsonResponse
 from django.utils import timezone
@@ -24,18 +24,8 @@ def handle_calendar_display(request):
 		request.session['shown_calendar_pks'] = shown_calendar_pks
 		request.session['hidden_calendar_pks'] = hidden_calendar_pks
 
-def handle_deleting_of_copied_and_unapproved_events():
-	for event in Event.objects.filter(approved=False):
-		#Delete event if it was created by an admin and is unapproved (this means that it's a copy)
-		if Group.objects.get(name='Admins') in event.creator.groups.all():
-			event.delete()
-		#Delete unapproved event if it is over 4 days old
-		elif event.edited_time + datetime.timedelta(days=4) < timezone.now():
-			event.delete()
-
 @xframe_options_exempt
-def calendarHomeView(request):
-	handle_deleting_of_copied_and_unapproved_events()
+def home(request):
 	handle_calendar_display(request)
 	if request.session.get('calendar_view', None):
 		if request.session['calendar_view'] == 'month':
@@ -50,8 +40,7 @@ def calendarHomeView(request):
 		return redirect('month', year=timezone.now().year, month=timezone.now().month)
 
 @xframe_options_exempt
-def calendarMonthView(request, year, month):
-	handle_deleting_of_copied_and_unapproved_events()
+def month(request, year, month):
 	handle_calendar_display(request)
 	current_year = get_object_or_404(Year, year=year)
 	current_month = get_object_or_404(Month, year=current_year, month=month)		
@@ -129,8 +118,7 @@ def calendarMonthView(request, year, month):
 	})
 
 @xframe_options_exempt
-def calendarWeekView(request, year, month, first_day_of_week):
-	handle_deleting_of_copied_and_unapproved_events()
+def week(request, year, month, first_day_of_week):
 	handle_calendar_display(request)
 	this_year = get_object_or_404(Year, year=year)
 	this_month = get_object_or_404(Month, year=this_year, month=month)
@@ -159,8 +147,7 @@ def calendarWeekView(request, year, month, first_day_of_week):
 	})
 
 @xframe_options_exempt
-def calendarDayView(request, year, month, day):
-	handle_deleting_of_copied_and_unapproved_events()
+def day(request, year, month, day):
 	handle_calendar_display(request)
 	this_year = get_object_or_404(Year, year=year)
 	this_month = get_object_or_404(Month, year=this_year, month=month)

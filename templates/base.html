@@ -17,10 +17,12 @@
 	<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	{% block js %}
+	{% endblock %}
 </head>
 <body>
 {% pagination_links request.path as pagination_links %}
-{% new_event_or_calendar_links request.path as new_event_or_calendar_links %}
+{% new_links request.path as new_links %}
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -74,7 +76,7 @@
 					</li>
 				{% endif %}
 		  		{# Displays the 'new' links when appropriate #}
-		  		{% if new_event_or_calendar_links %}
+		  		{% if new_links %}
 				    {% if perms.calendarapp.add_event or perms.calendarapp.add_calendar or perms.calendarapp.add_location %}
 					    <li class="dropdown">
 					        <a class="dropdown-toggle" data-toggle="dropdown">New <span class="caret"></span></a>
@@ -92,9 +94,16 @@
 					     </li>
 					{% endif %}
 				{% endif %}
-				{# Displays the pending events page for admins #}
+				{# Displays the pending stuff pages for admins #}
 				{% if request.user|in_group:"Admins" %}
-					<li><a href="{% url 'pending_events' %}">Pending Events</a></li>
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown">Pending <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="{% url 'pending_events' %}">Events</a></li>
+							<li><a href="{% url 'pending_calendars' %}">Calendars</a></li>
+							<li><a href="{% url 'pending_locations' %}">Locations</a></li>
+						</ul>
+					</li>
 				{% endif %}
 				{# Displays the login/signup/logout links when appropriate #}
 		  		{% if request.path != '/accounts/login/' or request.path != '/accounts/signup/' %}

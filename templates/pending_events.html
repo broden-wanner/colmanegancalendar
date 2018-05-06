@@ -3,14 +3,14 @@
 {% load staticfiles %}
 
 {% block css %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/pending_events.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/pending.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="container">
 	<h1>Pending Created Events:</h1>
 	{% if pending_created_events %}
-		<table class="table table-bordered pending-events-table">
+		<table class="table table-bordered pending-table">
 			<tr>
 				<th>Title</th>
 				<th>Calendar</th>
@@ -20,9 +20,9 @@
 				<th>Delete</th>
 			</tr>
 			{% for event in pending_created_events %}
-			<tr data-event-pk="{{ event.pk }}">
+			<tr data-event-pk="{{ event.pk }}" style="background-color: {{ event.calendar.color }};">
 				<td>
-					<a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">{{ event.title }}</a>
+					{{ event.title }}
 				</td>
 				<td>
 					{{ event.calendar.event_calendar }} Calendar
@@ -39,10 +39,10 @@
 				<td>
 					{{ event.creator }}
 				</td>
-				<td>
+				<td class="approve-column">
 					<input type="checkbox" name="approve-pending-created-events" value="{{ event.pk }}" id="pending-created-event-{{ event.pk }}">
 				</td>
-				<td>
+				<td class="delete-column">
 					<input type="checkbox" name="delete-pending-created-events" value="{{ event.pk }}" id="pending-created-event-{{ event.pk }}">
 				</td>
 			</tr>
@@ -53,43 +53,43 @@
 	{% endif %}
 	<h1>Pending Edited Events:</h1>
 	{% if pending_edited_events %}
-		<table class="table table-bordered pending-events-table">
+		<table class="table table-bordered pending-table">
 			<tr>
-				<th>Title</th>
-				<th>Calendar</th>
-				<th>Times</th>
-				<th>Creator</th>
-				<th>Editor</th>
+				<th>Edited Event</th>
+				<th>Original Event</th>
 				<th>Approve</th>
 				<th>Delete</th>
 			</tr>
 			{% for event in pending_edited_events %}
 			<tr data-event-pk="{{ event.pk }}">
-				<td>
-					<a href="{% url 'event_view' year=event.start_date.year month=event.start_date.month day=event.start_date.day pk=event.pk slug=event.slug %}">{{ event.title }}</a>
-				</td>
-				<td>
-					{{ event.calendar.event_calendar }} Calendar
-				</td>
-				<td>
+				<td class="edited-event-column" style="background-color: {{ event.calendar.color }};">
+					{{ event.title }} on the {{ event.calendar.event_calendar }} Calendar<br>
 					{% if event.all_day and event.start_date == event.end_date %}
 						{{ event.start_date }} (all-day)
 					{% elif event.all_day and event.start_date != event.end_date %}
 						{{ event.start_date }} - {{ event.end_date }} (all-day)
 					{% else %}
 						{{ event.start_date }}, {{ event.start_time }} &mdash; {{ event.end_date }}, {{ event.end_time }}
-					{% endif %}
+					{% endif %}<br>
+					Created by {{ event.creator }}<br>
+					Edited by {{ event.editor }}
 				</td>
-				<td>
-					{{ event.creator }}
+				<td class="original-event-column" style="background-color: {{ event.original_event.calendar.color }};">
+					{{ event.original_event.title }} on the {{ event.original_event.calendar.event_calendar }} Calendar<br>
+					{% if event.original_event.all_day and event.original_event.start_date == event.original_event.end_date %}
+						{{ event.original_event.start_date }} (all-day)
+					{% elif event.original_event.all_day and event.original_event.start_date != event.original_event.end_date %}
+						{{ event.original_event.start_date }} - {{ event.original_event.end_date }} (all-day)
+					{% else %}
+						{{ event.original_event.start_date }}, {{ event.original_event.start_time }} &mdash; {{ event.original_event.end_date }}, {{ event.original_event.end_time }}
+					{% endif %}<br>
+					Created by {{ event.original_event.creator }}<br>
+					Edited by {{ event.original_event.editor }}
 				</td>
-				<td>
-					{{ event.editor }}
-				</td>
-				<td>
+				<td class="approve-column" style="background-color: {{ event.calendar.color }};">
 					<input type="checkbox" name="approve-pending-edited-events" value="{{ event.pk }}" id="pending-edited-event-{{ event.pk }}">
 				</td>
-				<td>
+				<td class="delete-column" style="background-color: {{ event.original_event.calendar.color }};"> 
 					<input type="checkbox" name="delete-pending-edited-events" value="{{ event.pk }}" id="pending-edited-event-{{ event.pk }}">
 				</td>
 			</tr>
@@ -98,40 +98,31 @@
 	{% else %}
 		<p>None</p>
 	{% endif %}
+	<br>
 	<button id="event-change-submit" type="submit" class="btn btn-default">Submit Changes</button>
 	<div style="display: none;" id="overlay">
 		<div style="display: none;" id="delete-reason-form">
 			<span class="glyphicon glyphicon-remove"></span>
-			<h2 id="delete-form-header">Please enter the reason for deleting the following events:</h2>
+			<h2>Please enter the reason for deleting the following events:</h2>
 			<button id="delete-reason-submit" type="submit" class="btn btn-default">Submit Reasons</button>
 		</div>
 	</div>
 </div>
 
 <script type="text/javascript">
-//Control the checking and unchecking of the approval and delete boxes
-$('input[name="approve-pending-created-events"]').change(function () {
+{# Control the checking and unchecking of the approval and delete boxes #}
+$(".approve-column input").change(function () {
 	$(this).each(function () {
 		$(this).parent().next().find('input').prop('checked', false);
 	});
 });
-$('input[name="delete-pending-created-events"]').change(function () {
-	$(this).each(function () {
-		$(this).parent().prev().find('input').prop('checked', false);
-	});
-});
-$('input[name="approve-pending-edited-events"]').change(function () {
-	$(this).each(function () {
-		$(this).parent().next().find('input').prop('checked', false);
-	});
-});
-$('input[name="delete-pending-edited-events"]').change(function () {
+$(".delete-column input").change(function () {
 	$(this).each(function () {
 		$(this).parent().prev().find('input').prop('checked', false);
 	});
 });
 
-//Sends info back to the server
+{# Sends info back to the server #}
 $('#event-change-submit').click(function () {
 	var event_changes = {
 		approved_created_pks: [],
@@ -153,24 +144,25 @@ $('#event-change-submit').click(function () {
 	$('input[name="delete-pending-edited-events"]:checked').each(function () {
 		event_changes.deleted_edited_pks.push(parseInt($(this).val()));
 	});
-	//If there are deleted events, bring up the deleted events reason form
+	//If there are deleted events, bring up the deleted events reason form #}
 	if(event_changes.deleted_created_pks.length || event_changes.deleted_edited_pks.length) {
 		$("#overlay").show();
 		$("#delete-reason-form").show();
 		//Creates the list of the inputs for the created events
 		if(event_changes.deleted_created_pks.length) {
-			$("#delete-form-header").after("<p id='created-delete-header'>Created events to delete:</p>");
+			$("#delete-reason-form h2").after("<h4 id='created-delete-header'>Created events to delete:</h4><br>");
 			for(var i = 0; i < event_changes.deleted_created_pks.length; i++){
 				var pk = event_changes.deleted_created_pks[i];
-				var title = $("tr[data-event-pk='" + pk + "'] td a").text();
+				var title = $("tr[data-event-pk='" + pk + "'] td:first-of-type").text();
+				console.log(title);
 				var label = "<label for='delete-reason-" + pk + "'>" + title + " Event:</label>";
 				var input = "<input type='text' class='form-control' name='delete-reason' data-event-pk='" + pk + "' id='delete-reason-" + pk + "'>";
-				$("#created-delete-header").append("<div class='form-group'>" + label + input + "</div>");
+				$("#created-delete-header").after("<div class='form-group'>" + label + input + "</div>");
 			}
 		}
 		//Creates the list of the inputs for the edited events
 		if(event_changes.deleted_edited_pks.length) {
-			$("#delete-form-header").after("<p id='edited-delete-header'>Edited events to delete:</p>");
+			$("#delete-reason-form h2").after("<h4 id='edited-delete-header'>Edited events to delete:</h4><br>");
 			for(var i = 0; i < event_changes.deleted_edited_pks.length; i++){
 				var pk = event_changes.deleted_edited_pks[i];
 				var title = $("tr[data-event-pk='" + pk + "'] td a").text();
@@ -200,18 +192,18 @@ $('#event-change-submit').click(function () {
 				data: event_changes,
 				dataType: 'json',
 				success: function(data) {
-					console.log('Success');
+					location.reload(true);
 				}
 			});
 		});
 	} else {
-		//Just send the infor if there are no events to be deleted
+		//Just send the info if there are no events to be deleted
 		$.ajax({
 			url: "{% url 'ajax_pending_events' %}",
 			data: event_changes,
 			dataType: 'json',
 			success: function(data) {
-				console.log('Success');
+				location.reload(true);
 			}
 		});
 	}

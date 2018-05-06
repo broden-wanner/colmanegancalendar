@@ -11,6 +11,12 @@ h1 {
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
+#events-panel, #calendar-panel, #location-panel {
+	max-height: calc(100vh - 18em);
+	padding-left: 1em;
+	overflow-y: auto;
+}
+
 .event-table tr[data-event-pk] td, .calendar-table tr[data-calendar-pk] td {
 	border: 3px solid white;
 	color: white;

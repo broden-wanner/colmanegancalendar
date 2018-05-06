@@ -1,0 +1,57 @@
+/* Makes the text of the event data white */
+.pending-table tr td {
+	color: white;
+	text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Adds shadow around the events table */
+.pending-table {
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+td.approve-column, td.delete-column {
+	text-align: center; /* center checkbox horizontally */
+    width: 7%;
+}
+
+input[type=checkbox] {
+	margin-top: 2em;
+}
+
+/* Creates the overlay to be put up when the admin wants to delete stuff */
+#overlay {
+	background: rgba(0, 0, 0, 0.5);
+	width: 100vw;
+	height: 100vh;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+/* Sets the style for the delete reason form */
+#delete-reason-form {
+	background: white;
+	position: absolute;
+	top: 25%;
+	left: 15%;
+	right: 15%;
+	padding: 1em 1em 1em 1em;
+}
+
+#delete-reason-form h2 {
+	margin-top: 0;
+}
+
+/* Sets the x-mark for closing the reason form */
+span.glyphicon.glyphicon-remove {
+	float: right;
+}
+
+/* Sets cursor for x-mark */
+span.glyphicon.glyphicon-remove:hover {
+	color: rgba(157, 157, 157, 0.5);
+	cursor: pointer;
+}
+

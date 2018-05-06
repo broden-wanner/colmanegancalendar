@@ -33,12 +33,12 @@ def event_conflicts(test_event, original_event=None):
 		return None
 	return conflicts
 
-def calendarEventView(request, year, month, day, pk, slug):
+def event_view(request, year, month, day, pk, slug):
 	event = get_object_or_404(Event, pk=pk, slug=slug)
 	return render(request, 'event_view.html', {'event': event})
 
 @login_required
-def newEventView(request):
+def new_event(request):
 	if request.method == 'POST':
 		new_event_form = EventForm(request.POST)
 		if new_event_form.is_valid():
@@ -95,7 +95,6 @@ def approve_event(request, slug, pk):
 		if event.approved == False:
 			event.approved = True
 			event.save()
-			current_site = get_current_site(request)
 			subject = f'Event Approved: {event.title} on {event.start_date}'
 			content = {
 				'user': event.creator,
@@ -141,7 +140,7 @@ def reject_event(request, slug, pk):
 	return render(request, 'approve/message.html', {'message': 'There was an error in approving the event. Be sure you are logged in as an Admin and click the link in the email again.'})
 
 @login_required
-def editEventView(request, year, month, day, pk, slug):
+def edit_event(request, year, month, day, pk, slug):
 	event = get_object_or_404(Event, pk=pk, slug=slug)
 	if request.method == 'POST':
 		event_form = EventForm(request.POST, instance=event)
@@ -257,7 +256,7 @@ def reject_event_change(request, original_slug, original_pk, changed_slug, chang
 	return render(request, 'approve/message.html', {'message': 'There was an error in approving the event. Be sure you are logged in as an Admin and click the link in the email again.'})
 
 @login_required
-def deleteEventView(request, year, month, day, pk, slug):
+def delete_event(request, year, month, day, pk, slug):
 	event = get_object_or_404(Event, pk=pk, slug=slug)
 	if request.method == 'POST':
 		if Group.objects.get(name='Admins') in request.user.groups.all():
@@ -367,13 +366,13 @@ def pending_events(request):
 
 @login_required
 def ajax_pending_events(request):
-	if request.is_ajax():
+	if request.is_ajax() and Group.objects.get(name='Admins') in request.user.groups.all():
 		if request.GET.getlist('delete_reasons[]', None):
-			delete_reasons = [json.loads(x) for x in request.GET.getlist('delete_reasons[]', None)]
+			delete_reasons = [json.loads(x) for x in request.GET.getlist('delete_reasons[]')]
 			#print(f'delete_reasons: {delete_reasons}')
 		approved_created_pks = [int(x) for x in request.GET.getlist('approved_created_pks[]')]
 		#print(f'approved_created_pks: {approved_created_pks}')
-		'''if approved_created_pks:
+		if approved_created_pks:
 			#Send an email to all users to tell them
 			for pk in approved_created_pks:
 				try:
@@ -388,19 +387,16 @@ def ajax_pending_events(request):
 						'user': event.creator,
 						'event': event,
 					}
-					text_message = render_to_string('email/event_approved_email.html', content)
-					html_message = render_to_string('email/event_approved_html_email.html', content)
-					msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, [event.creator.email])
-					msg.attach_alternative(html_message, 'text/html')
-					msg.send()'''
+					message = render_to_string('email/event_approved_email.html', content)
+					send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [event.creator.email])
 		deleted_created_pks = [int(x) for x in request.GET.getlist('deleted_created_pks[]')]
-		'''if deleted_created_pks:
+		if deleted_created_pks:
 			for pk in deleted_created_pks:
 				try:
 					event = Event.objects.get(pk=pk)
 				except Event.DoesNotExist:
 					continue
-				reason = filter(lambda reason: reason['pk'] == str(pk), delete_reasons)['reason']
+				reason = next(filter(lambda reason: reason['pk'] == str(pk), delete_reasons))['reason']
 				deleting_user = request.user
 				subject = f'Event Deleted: {event.title} on {event.start_date}'
 				content = {
@@ -408,16 +404,13 @@ def ajax_pending_events(request):
 					'event': event,
 					'reason': reason,
 				}
-				text_message = render_to_string('email/event_delete_approved_email.html', content)
-				html_message = render_to_string('email/event_delete_approved_html_email.html', content)
+				message = render_to_string('email/event_delete_approved_email.html', content)
 				recipients = []
 				if event.creator != deleting_user:
 					recipients.append(event.creator.email)
 				recipients.append(deleting_user.email)
-				msg = EmailMultiAlternatives(subject, text_message, settings.DEFAULT_FROM_EMAIL, recipients)
-				msg.attach_alternative(html_message, 'text/html')
-				msg.send()
-				event.delete()'''
+				send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipients)
+				event.delete()
 		#print(f'deleted_created_pks: {deleted_created_pks}')
 		approved_edited_pks = [int(x) for x in request.GET.getlist('approved_edited_pks[]')]
 		#print(f'approved_edited_pks: {approved_edited_pks}')
