@@ -1,4 +1,4 @@
-settings.py
+calendar_base/settings.py
 *.pyc
 *~
 __pycache__
